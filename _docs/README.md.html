@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>README.md</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <link rel="stylesheet" media="all" href="doc-style.css" />
+  <script src="doc-filelist.js"></script>
+  <script>
+    var relativeDir = "", thisFile = "README.md", defaultSidebar = true;
+  </script>
+  <script src="doc-script.js"></script>
+</head>
+<body>
+  <div id="sidebar_wrapper">
+    <div id="sidebar_switch">
+      <span class="tree">Files</span>
+      <span class="headings">Headings</span>
+    </div>
+    <div id="tree"></div>
+    <div id="headings">
+      <div class="heading h1">
+        <a href="#obj-schema">obj-schema</a>
+      </div>
+      <div class="heading h2">
+        <a href="#install">Install</a>
+      </div>
+      <div class="heading h2">
+        <a href="#initialize">Initialize</a>
+      </div>
+      <div class="heading h2">
+        <a href="#schema-types">Schema-Types</a>
+      </div>
+      <div class="heading h4">
+        <a href="#general">General</a>
+      </div>
+      <div class="heading h4">
+        <a href="#number">number</a>
+      </div>
+      <div class="heading h4">
+        <a href="#string">string</a>
+      </div>
+      <div class="heading h4">
+        <a href="#boolean">boolean</a>
+      </div>
+      <div class="heading h4">
+        <a href="#array">array</a>
+      </div>
+      <div class="heading h4">
+        <a href="#object">object</a>
+      </div>
+      <div class="heading h4">
+        <a href="#email">email</a>
+      </div>
+      <div class="heading h4">
+        <a href="#enum">enum</a>
+      </div>
+      <div class="heading h4">
+        <a href="#schema">schema</a>
+      </div>
+      <div class="heading h4">
+        <a href="#timezone">timezone</a>
+      </div>
+      <div class="heading h2">
+        <a href="#methods">Methods</a>
+      </div>
+      <div class="heading h3">
+        <a href="#.validate(%20object%20)">.validate( object )</a>
+      </div>
+      <div class="heading h3">
+        <a href="#.keys()">.keys()</a>
+      </div>
+      <div class="heading h3">
+        <a href="#.validatecb(%20object%5B%2C%20cb%5D%20)">.validateCb( object[, cb] )</a>
+      </div>
+      <div class="heading h2">
+        <a href="#release%20history">Release History</a>
+      </div>
+      <div class="heading h2">
+        <a href="#other%20projects">Other projects</a>
+      </div>
+      <div class="heading h2">
+        <a href="#the%20mit%20license%20(mit)">The MIT License (MIT)</a>
+      </div>
+    </div>
+  </div>
+  <div id="sidebar-toggle"></div>
+  <div id="container"><div class="docs markdown">
+<div class="pilwrap" id="obj-schema">
+  <h1>
+    <a href="#obj-schema" name="obj-schema" class="pilcrow">&#182;</a>
+    obj-schema
+  </h1>
+</div>
+
+
+<p><a href="http://travis-ci.org/mpneuried/obj-schema"><img src="https://secure.travis-ci.org/mpneuried/obj-schema.png?branch=master" alt="Build Status" title="" /></a>
+<a href="https://david-dm.org/mpneuried/obj-schema"><img src="https://david-dm.org/mpneuried/obj-schema.png" alt="Build Status" title="" /></a>
+<a href="http://badge.fury.io/js/obj-schema"><img src="https://badge.fury.io/js/obj-schema.png" alt="NPM version" title="" /></a></p>
+
+<p>Simple module to validate an object by a predefined schema</p>
+
+<p><a href="https://nodei.co/npm/obj-schema/"><img src="https://nodei.co/npm/obj-schema.png?downloads=true&amp;stars=true" alt="NPM" title="" /></a></p>
+
+<p><em>Written in coffee-script</em></p>
+
+<p><strong>INFO: all examples are written in coffee-script</strong></p>
+
+
+<div class="pilwrap" id="install">
+  <h2>
+    <a href="#install" name="install" class="pilcrow">&#182;</a>
+    Install
+  </h2>
+</div>
+
+
+<div class='highlight'><pre><code language=''>  npm install obj-schema
+</code></pre></div>
+
+
+<div class="pilwrap" id="initialize">
+  <h2>
+    <a href="#initialize" name="initialize" class="pilcrow">&#182;</a>
+    Initialize
+  </h2>
+</div>
+
+
+<pre><code language='js'>    var Schema = require( "obj-schema" );
+
+    uservalidator = new Schema( {
+        "name": {
+            type: "string",
+            required: true
+        },
+        "email": {
+            type: "email"
+        },
+        "age": {
+            type: "number",
+            default: 42
+        }
+    }, { name: "user" });
+
+    console.log( uservalidator.validate( { name: "John", email: "<a href='mailto:john@do.com'>john@do.com</a>", age: 23 } ) ); // null
+    console.log( uservalidator.validate( { name: "John", email: "<a href='mailto:john@do.com'>john@do.com</a>", age: "23" } ) ); // Error[`EVALIDATION_USER_NUMBER_AGE`: The value in `age` has to be a number]
+</code></pre>
+
+<p>The schema will check the given object against the defined rules and returns <code>null</code> on success or an error if the object is not valid.
+If the schema is configured to change the values it'll do this directly on the object reference.</p>
+
+<p><strong>Config</strong> </p>
+
+<ul>
+<li><strong>schema</strong>: <em>( <code>Object</code> required )</em> : The schema for validation
+<ul><li><strong>schema[ {key} ]</strong> : <em>( <code>Object</code> )</em> Every key will be validated by the given config. See section <strong>Schema-Types</strong></li></ul></li>
+<li><strong>options</strong> <em>( <code>Object</code> optional )</em> The configuration object
+<ul><li><strong>options.name</strong> : <em>( <code>String</code> optional: default = <code>data</code> )</em> A name used to inject it to the error name.</li></ul></li>
+</ul>
+
+
+<div class="pilwrap" id="schema-types">
+  <h2>
+    <a href="#schema-types" name="schema-types" class="pilcrow">&#182;</a>
+    Schema-Types
+  </h2>
+</div>
+
+
+
+<div class="pilwrap" id="general">
+  <h4>
+    <a href="#general" name="general" class="pilcrow">&#182;</a>
+    General
+  </h4>
+</div>
+
+
+<ul>
+<li><strong>type</strong>: <em>( <code>String</code> )</em>: The data type for detailed validation. All availible types will be described below.</li>
+<li><strong>required</strong>: <em>( <code>Boolean</code> )</em>: This key is required</li>
+<li><strong>default</strong>: <em>( <code>Any|Function</code> )</em>: A default value or a function to generate the default. This function will receive the arguments <code>( data, def )</code>. <code>data</code> = the whole object to validate; <code>def</code> = the current schema type config.</li>
+<li><strong>foreignReq</strong>: <em>( <code>String[]</code> )</em>: is only valid if the keys within this list exists</li>
+</ul>
+
+
+<div class="pilwrap" id="number">
+  <h4>
+    <a href="#number" name="number" class="pilcrow">&#182;</a>
+    <code>number</code>
+  </h4>
+</div>
+
+
+<p>Check if the value is of type <code>number</code></p>
+
+<ul>
+<li><strong>check</strong>: <em>( <code>Object</code> )</em>: A configuration to chack the given value against a predefined value
+<ul><li><strong>check.operand</strong>: <em>( <code>String</code> enum: <code>eq</code>, <code>==</code>, <code>=</code>, <code>neq</code>, <code>!=</code>, <code>gt</code>, <code>&gt;</code>, <code>gte</code>, <code>&gt;=</code>, <code>lt</code>, <code>&lt;</code>, <code>lte</code>, <code>&lt;=</code> )</em>: the operand to use against</li>
+<li><strong>check.value</strong>: <em>( <code>Number</code> )</em> The value to check against</li></ul></li>
+</ul>
+
+
+<div class="pilwrap" id="string">
+  <h4>
+    <a href="#string" name="string" class="pilcrow">&#182;</a>
+    <code>string</code>
+  </h4>
+</div>
+
+
+<p>Check if the value is of type <code>string</code></p>
+
+<ul>
+<li><strong>regexp</strong>: <em>( <code>RegExp</code> )</em>: A regular expression to check against the value</li>
+<li><strong>sanitize</strong>: <em>( <code>Boolean</code> )</em>: sanitize this sting</li>
+<li><strong>striphtml</strong>: <em>( <code>Boolean</code> )</em>: strip all html tags out of the string</li>
+</ul>
+
+
+<div class="pilwrap" id="boolean">
+  <h4>
+    <a href="#boolean" name="boolean" class="pilcrow">&#182;</a>
+    <code>boolean</code>
+  </h4>
+</div>
+
+
+<p>Check if the value is of type <code>boolean</code></p>
+
+
+<div class="pilwrap" id="array">
+  <h4>
+    <a href="#array" name="array" class="pilcrow">&#182;</a>
+    <code>array</code>
+  </h4>
+</div>
+
+
+<p>Check if the value is of type <code>array</code></p>
+
+
+<div class="pilwrap" id="object">
+  <h4>
+    <a href="#object" name="object" class="pilcrow">&#182;</a>
+    <code>object</code>
+  </h4>
+</div>
+
+
+<p>Check if the value is of type <code>object</code></p>
+
+
+<div class="pilwrap" id="email">
+  <h4>
+    <a href="#email" name="email" class="pilcrow">&#182;</a>
+    <code>email</code>
+  </h4>
+</div>
+
+
+<p>Check if the value is of type <code>string</code> and is a valid email</p>
+
+
+<div class="pilwrap" id="enum">
+  <h4>
+    <a href="#enum" name="enum" class="pilcrow">&#182;</a>
+    <code>enum</code>
+  </h4>
+</div>
+
+
+<p>Check if the value is of type <code>string</code> and is one of the configured elements</p>
+
+<ul>
+<li><strong>values</strong>: <em>( <code>String[]</code> )</em>: An array of strings that are valid</li>
+</ul>
+
+
+<div class="pilwrap" id="schema">
+  <h4>
+    <a href="#schema" name="schema" class="pilcrow">&#182;</a>
+    <code>schema</code>
+  </h4>
+</div>
+
+
+<p>Check if the value is of type <code>object</code> and check against another given schema</p>
+
+<ul>
+<li><strong>schema</strong>: <em>( <code>ObjSchema</code> )</em>: A additional schema</li>
+</ul>
+
+
+<div class="pilwrap" id="timezone">
+  <h4>
+    <a href="#timezone" name="timezone" class="pilcrow">&#182;</a>
+    <code>timezone</code>
+  </h4>
+</div>
+
+
+<p>Check if the value is of type <code>string</code> and is a valid <a href="http://momentjs.com/timezone/">moment timezone</a></p>
+
+
+<div class="pilwrap" id="methods">
+  <h2>
+    <a href="#methods" name="methods" class="pilcrow">&#182;</a>
+    Methods
+  </h2>
+</div>
+
+
+
+<div class="pilwrap" id=".validate(%20object%20)">
+  <h3>
+    <a href="#.validate(%20object%20)" name=".validate(%20object%20)" class="pilcrow">&#182;</a>
+    <code>.validate( object )</code>
+  </h3>
+</div>
+
+
+<p>The main validation method</p>
+
+<p><strong>Arguments</strong></p>
+
+<ul>
+<li><code>object</code> : <em>( <code>Object</code> required )</em>: The object to validate against the schema</li>
+</ul>
+
+<p><strong>Return</strong></p>
+
+<p><em>( Null|Error )</em>: Returns <code>null</code> on success and an error if the validation failed. </p>
+
+
+<div class="pilwrap" id=".keys()">
+  <h3>
+    <a href="#.keys()" name=".keys()" class="pilcrow">&#182;</a>
+    <code>.keys()</code>
+  </h3>
+</div>
+
+
+<p>Returns an array of all keys within the schema.</p>
+
+<p><strong>Return</strong></p>
+
+<p><em>( Array )</em>: Schema keys.</p>
+
+
+<div class="pilwrap" id=".validatecb(%20object%5B%2C%20cb%5D%20)">
+  <h3>
+    <a href="#.validatecb(%20object%5B%2C%20cb%5D%20)" name=".validatecb(%20object%5B%2C%20cb%5D%20)" class="pilcrow">&#182;</a>
+    <code>.validateCb( object[, cb] )</code>
+  </h3>
+</div>
+
+
+<p>A helper method to use it with a callback. </p>
+
+<ul>
+<li>If <code>cb = null</code> a error will be thrown</li>
+<li>If <code>cb</code> is a function the error will be returned as first argument. <strong>On success the callback will not executed!</strong></li>
+<li>If <code>cb</code> is not a function ( like a boolean or string ) it'll just returnes the error</li>
+</ul>
+
+<p><strong>Arguments</strong></p>
+
+<ul>
+<li><code>object</code> : <em>( <code>Object</code> required )</em>: The object to validate against the schema</li>
+<li><code>cb</code> : <em>( <code>Object</code> required )</em>: The object to validate against the schema</li>
+</ul>
+
+<p><strong>Return</strong></p>
+
+<p><em>( Null|Error )</em>: Returns <code>null</code> on success and an error if the validation failed. </p>
+
+<p><strong>Example</strong></p>
+
+
+<div class="highlight"><pre><code>    <span class="kd">function</span> <span class="nx">create</span><span class="p">(</span> <span class="nx">data</span><span class="p">,</span> <span class="nx">cb</span> <span class="p">){</span>
+        <span class="k">if</span><span class="p">(</span> <span class="o">!</span><span class="nx">uservalidator</span><span class="p">(</span> <span class="nx">data</span><span class="p">,</span> <span class="nx">cb</span> <span class="p">)){</span>
+            <span class="c1">// do your stuff</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+</code></pre></div>
+
+
+
+
+<div class="pilwrap" id="release%20history">
+  <h2>
+    <a href="#release%20history" name="release%20history" class="pilcrow">&#182;</a>
+    Release History
+  </h2>
+</div>
+
+
+<p>|Version|Date|Description|
+|:--:|:--:|:--|
+|0.0.1|2015-1-29|Initial version|</p>
+
+<p><a href="https://nodei.co/npm/obj-schema/"><img src="https://nodei.co/npm-dl/obj-schema.png?months=6" alt="NPM" title="" /></a></p>
+
+<blockquote>
+  <p>Initially Generated with <a href="https://github.com/mpneuried/generator-mpnodemodule">generator-mpnodemodule</a></p>
+</blockquote>
+
+
+<div class="pilwrap" id="other%20projects">
+  <h2>
+    <a href="#other%20projects" name="other%20projects" class="pilcrow">&#182;</a>
+    Other projects
+  </h2>
+</div>
+
+
+<p>|Name|Description|
+|:--|:--|
+|<a href="https://github.com/smrchy/rsmq"><strong>rsmq</strong></a>|A really simple message queue based on Redis|
+|<a href="https://github.com/mpneuried/rsmq-worker"><strong>rsmq-worker</strong></a>|Helper to simply implement a worker <a href="https://github.com/smrchy/rsmq">RSMQ ( Redis Simple Message Queue )</a>.|
+|<a href="https://github.com/mpneuried/redis-notifications"><strong>redis-notifications</strong></a>|A redis based notification engine. It implements the rsmq-worker to savely create notifications and recurring reports|
+|<a href="https://github.com/tcs-de/nodecache"><strong>node-cache</strong></a>|Simple and fast NodeJS internal caching. Node internal in memory cache like memcached.|
+|<a href="https://github.com/smrchy/redis-sessions"><strong>redis-sessions</strong></a>|An advanced session store for NodeJS and Redis|
+|<a href="https://github.com/mpneuried/connect-redis-sessions"><strong>connect-redis-sessions</strong></a>|A connect or express middleware to simply use the <a href="https://github.com/smrchy/redis-sessions">redis sessions</a>. With <a href="https://github.com/smrchy/redis-sessions">redis sessions</a> you can handle multiple sessions per user_id.|
+|<a href="https://github.com/mpneuried/systemhealth"><strong>systemhealth</strong></a>|Node module to run simple custom checks for your machine or it's connections. It will use <a href="https://github.com/mpneuried/redis-heartbeat">redis-heartbeat</a> to send the current state to redis.|
+|<a href="https://github.com/smrchy/task-queue-worker"><strong>task-queue-worker</strong></a>|A powerful tool for background processing of tasks that are run by making standard http requests.|
+|<a href="https://github.com/mpneuried/soyer"><strong>soyer</strong></a>|Soyer is small lib for serverside use of Google Closure Templates with node.js.|
+|<a href="https://github.com/mpneuried/grunt-soy-compile"><strong>grunt-soy-compile</strong></a>|Compile Goggle Closure Templates ( SOY ) templates inclding the handling of XLIFF language files.|
+|<a href="https://github.com/mpneuried/backlunr"><strong>backlunr</strong></a>|A solution to bring Backbone Collections together with the browser fulltext search engine Lunr.js|</p>
+
+
+<div class="pilwrap" id="the%20mit%20license%20(mit)">
+  <h2>
+    <a href="#the%20mit%20license%20(mit)" name="the%20mit%20license%20(mit)" class="pilcrow">&#182;</a>
+    The MIT License (MIT)
+  </h2>
+</div>
+
+
+<p>Copyright © 2015 M. Peter, <a href='http://www.tcs.de'>http://www.tcs.de</a></p>
+
+<p>Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:</p>
+
+<p>The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.</p>
+
+<p>THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p></div>
+  </div>
+</body>
+</html>

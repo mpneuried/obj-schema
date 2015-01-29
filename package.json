@@ -1,0 +1,43 @@
+{
+	"name": "obj-schema",
+	"version": "0.0.1",
+	"description": "Simple module to validate an object by a predefined schema",
+	"keywords": [ "object", "validate", "obj", "schema", "validator", "test", "check" ],
+	"homepage": "https://github.com/mpneuried/obj-schema",
+	"bugs": "https://github.com/mpneuried/obj-schema/issues",
+	"author": {
+		"name": "mpneuried",
+		"email": "",
+		"url": "https://github.com/obj-schema"
+	},
+	"main": "./index.js",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/mpneuried/obj-schema.git"
+	},
+	"scripts": {
+		"test": "grunt test",
+		"prepublish": "grunt build-dev"
+	},
+	"engines": {
+		"node": ">= 0.10.0"
+	},
+	"license": "MIT",
+	"dependencies": {
+		"mpbasic": "0.0.x",
+		"lodash": "3.0.x",
+		"moment-timezone": "0.3.x",
+		"sanitizer": "0.1.x",
+		"htmlstrip-native": "0.0.x"
+	},
+	"devDependencies": {
+		"should": "4.3.x",
+		"grunt": "0.4.x",
+		"grunt-regarde": "*",
+		"grunt-contrib-coffee": "*",
+		"grunt-include-replace": "*",
+		"grunt-mocha-cli": "*",
+		"grunt-docker": "0.0.x",
+		"grunt-contrib-clean": "*"
+	}
+}
