@@ -94,31 +94,41 @@ module.exports = class ObjSchema extends require( "mpbasic" )()
 
 			if _val? and def.type is "string" and def.sanitize
 				data[ _k ] = sanitizer.sanitize( data[ _k ] )
-
+				
 			if _val? and def.type is "string" and def.striphtml
 				data[ _k ] = htmlStrip( data[ _k ] )
 
-			if _val? and def.type is "number"  and def.check?.operand? and def.check?.value?
+			if _val? and def.type is "string" and def.trim
+				data[ _k ] = @trim( data[ _k ] )
+
+			if _val? and def.type in [ "number", "string"]  and def.check?.operand? and def.check?.value?
+				if def.type is "string"
+					_ename = "length"
+					__val = _val.length
+				else
+					_ename = "check"
+					__val = _val
+				
 				switch def.check.operand.toLowerCase()
 					when "eq", "=", "=="
-						if _val isnt def.check.value
-							return @_error( "check", _k, def, { "info": "not equal" } )
+						if __val isnt def.check.value
+							return @_error( _ename, _k, def, { "info": "not equal `#{def.check.value}`" } )
 					when "neq", "!="
-						if _val is def.check.value
-							return @_error( "check", _k, def, { "info": "equal" } )
+						if __val is def.check.value
+							return @_error( _ename, _k, def, { "info": "equal `#{def.check.value}`" } )
 					when "gt", ">"
-						if _val <= def.check.value
-							return @_error( "check", _k, def, { "info": "to low" } )
+						if __val <= def.check.value
+							return @_error( _ename, _k, def, { "info": "to low" } )
 					when "gte", ">="
-						if _val < def.check.value
-							return @_error( "check", _k, def, { "info": "to low" } )
+						if __val < def.check.value
+							return @_error( _ename, _k, def, { "info": "to low" } )
 					when "lt", "<"
-						if _val >= def.check.value
-							return @_error( "check", _k, def, { "info": "to high" } )
+						if __val >= def.check.value
+							return @_error( _ename, _k, def, { "info": "to high" } )
 					when "lte", "<="
-						if _val > def.check.value
-							return @_error( "check", _k, def, { "info": "to high" } )
-
+						if __val > def.check.value
+							return @_error( _ename, _k, def, { "info": "to high" } )
+			
 			if _val? and def.type is "enum" and def.values? and _val not in def.values
 				return @_error( "enum", _k, def, { values: def.values.join(", ") } )
 
@@ -127,7 +137,9 @@ module.exports = class ObjSchema extends require( "mpbasic" )()
 					return @_error( "required", _fkey, @schema[ _fkey ] )
 
 		return null	
-
+	
+	trim: ( str )->
+		return str.replace(/^\s+|\s+$/g, '')
 
 	_error: ( errtype, key, def, opt )=>
 		_err = new Error()
@@ -135,6 +147,9 @@ module.exports = class ObjSchema extends require( "mpbasic" )()
 		_err.message = @msgs[ errtype ]?( { key: key, def: def, opt: opt } ) or "-"
 		_err.statusCode = 406
 		_err.customError = true
+		_err.type = errtype
+		_err.field = key
+		_err.opt = opt
 		return _err
 	
 	_initMsgs: =>
@@ -151,8 +166,8 @@ module.exports = class ObjSchema extends require( "mpbasic" )()
 		boolean: "The value in `<%= key %>` has to be a boolean"
 		object: "The value in `<%= key %>` has to be a object"
 		check: "The value in `<%= key %>` is <%= opt.info %>"
+		length: "The string length in `<%= key %>` is <%= opt.info %>"
 		email: "The value in `<%= key %>` has to be a valid email"
 		timezone: "The value in `<%= key %>` has to be a valid timezone. Please check the moment-timezone (http://momentjs.com/timezone)"
 		enum: "The value in `<%= key %>` has to be one of `<%= opt.values %>`"
 		regexp: "The value in `<%= key %>` does not match the regural expression <%= opt.regexp %>"
-

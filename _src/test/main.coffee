@@ -22,6 +22,21 @@ describe "----- obj-schema TESTS -----", ->
 			"name": 
 				type: "string"
 				required: true
+				check: 
+					operand: ">="
+					value: 4
+			
+			"nickname": 
+				type: "string"
+				check: 
+					operand: "<"
+					value: 10
+					
+			"type": 
+				type: "string"
+				check: 
+					operand: "eq"
+					value: 2
 
 			"sex": 
 				type: "string"
@@ -86,6 +101,8 @@ describe "----- obj-schema TESTS -----", ->
 		it "success", ( done )->
 			_data = 
 				name: "John"
+				nickname: "johndoe"
+				type: "ab"
 				email: "john@do.com"
 				sex: "M"
 				tag: "A"
@@ -124,6 +141,8 @@ describe "----- obj-schema TESTS -----", ->
 			err = userValidator.validate( { email: "john@do.com", age: "23" } )
 			should.exist( err )
 			err.name.should.eql( "EVALIDATION_USER_REQUIRED_NAME" )
+			err.field.should.eql( "name" )
+			err.type.should.eql( "required" )
 			done()
 			return
 
@@ -131,6 +150,8 @@ describe "----- obj-schema TESTS -----", ->
 			err = userValidator.validate( { name: "John", email: "john@do.com", age: "23" } )
 			should.exist( err )
 			err.name.should.eql( "EVALIDATION_USER_NUMBER_AGE" )
+			err.field.should.eql( "age" )
+			err.type.should.eql( "number" )
 			done()
 			return
 
@@ -138,6 +159,8 @@ describe "----- obj-schema TESTS -----", ->
 			err = userValidator.validate( { name: "John", email: "johndocom", age: 23 } )
 			should.exist( err )
 			err.name.should.eql( "EVALIDATION_USER_EMAIL_EMAIL" )
+			err.field.should.eql( "email" )
+			err.type.should.eql( "email" )
 			done()
 			return
 
@@ -215,6 +238,35 @@ describe "----- obj-schema TESTS -----", ->
 			err = userValidator.validate( { name: "John", sex: "X" } )
 			should.exist( err )
 			err.name.should.eql( "EVALIDATION_USER_REGEXP_SEX" )
+			done()
+			return
+		
+		it "faling string length too low", ( done )->
+			err = userValidator.validate( { name: "Jo", email: "john@do.com", age: 0 } )
+			should.exist( err )
+			err.name.should.eql( "EVALIDATION_USER_LENGTH_NAME" )
+			done()
+			return
+		
+		it "faling string length too high", ( done )->
+			err = userValidator.validate( { name: "John", nickname: "johntheipsumdo", age: 0 } )
+			should.exist( err )
+			err.name.should.eql( "EVALIDATION_USER_LENGTH_NICKNAME" )
+			done()
+			return
+		
+		it "faling string length neq - low", ( done )->
+			err = userValidator.validate( { name: "John", type: "x", age: 0 } )
+			should.exist( err )
+			err.name.should.eql( "EVALIDATION_USER_LENGTH_TYPE" )
+			done()
+			return
+		
+		it "faling string length neq - high", ( done )->
+			err = userValidator.validate( { name: "John", type: "abc", age: 0 } )
+			should.exist( err )
+			err.name.should.eql( "EVALIDATION_USER_LENGTH_TYPE" )
+			err.type.should.eql( "length" )
 			done()
 			return
 

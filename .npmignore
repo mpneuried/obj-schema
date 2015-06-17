@@ -7,4 +7,5 @@ config.json
 config*.json
 deploy.json
 .editorconfig
+coffeelint.json
 .travis.yml

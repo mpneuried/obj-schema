@@ -67,7 +67,7 @@ If the schema is configured to change the values it'll do this directly on the o
 
 Check if the value is of type `number`
 
-- **check**: *( `Object` )*: A configuration to chack the given value against a predefined value
+- **check**: *( `Object` )*: A configuration to check the given value against a predefined value
 	- **check.operand**: *( `String` enum: `eq`, `==`, `=`, `neq`, `!=`, `gt`, `>`, `gte`, `>=`, `lt`, `<`, `lte`, `<=` )*: the operand to use against
 	- **check.value**: *( `Number` )* The value to check against
 
@@ -78,6 +78,11 @@ Check if the value is of type `string`
 - **regexp**: *( `RegExp` )*: A regular expression to check against the value
 - **sanitize**: *( `Boolean` )*: sanitize this sting
 - **striphtml**: *( `Boolean` )*: strip all html tags out of the string
+- **trim**: *( `Boolean` )*: trim the string
+
+- **check**: *( `Object` )*: A configuration to check the given string. length against a predefined value
+	- **check.operand**: *( `String` enum: `eq`, `==`, `=`, `neq`, `!=`, `gt`, `>`, `gte`, `>=`, `lt`, `<`, `lte`, `<=` )*: the operand to use against
+	- **check.value**: *( `Number` )* The string length to check against
 
 #### `boolean`
 
@@ -163,6 +168,7 @@ A helper method to use it with a callback.
 ## Release History
 |Version|Date|Description|
 |:--:|:--:|:--|
+|0.1.0|2015-06-17|added string trim, added string length checks|
 |0.0.1|2015-1-29|Initial version|
 
 [![NPM](https://nodei.co/npm-dl/obj-schema.png?months=6)](https://nodei.co/npm/obj-schema/)
