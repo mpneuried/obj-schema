@@ -165,9 +165,38 @@ A helper method to use it with a callback.
 	}
 ```
 
+## Error
+
+This module uses a custom Error ( `ObjSchemaError` ) to add some meta data to the validation error response.
+
+**Arguments**
+
+* `name` : *( `String` )*: The error name. Format: `EVALIDATION_{options.name}_{error-type}_{object-key}` E.g. `EVALIDATION_USER_REQUIRED_NAME`
+* `message` : *( `String` )*: A human friendly error message. E.g. `Please define the value 'name'`
+* `stack` : *( `String` )*: A error stack trace
+* `customError` : *( `Boolean` )*: A flag to define this error as a custom error. This is always `true`.
+* `statusCode` : *( `Number` )*: A http status code to use in http response
+* `type` : *( `String` )*: The objects error type.  
+Possible error types:
+    * `required` : Is required and not set
+    * `number` : Is not a number
+    * `string` : Is not a string
+    * `boolean` : Is not boolean
+    * `array` : Is not an array
+    * `object` : Is not a object
+    * `email` : Is not a email
+    * `timezone` : Is not a moment timezone. see [moment timezone](http://momentjs.com/timezone/)
+    * `regexp` : Doesn't match the regular expression
+    * `enum` : Is not within the given list
+    * `length` : The string length  isn't within the defined boundaries
+    * `check` : The numeric value isn't within the defined boundaries
+* `field` : *( `String` )*: The objects field the error occurred in. E.g. `name`
+
+
 ## Release History
 |Version|Date|Description|
 |:--:|:--:|:--|
+|0.1.1|2015-06-18|better validation error with custom fields. optimized readme.|
 |0.1.0|2015-06-17|added string trim, added string length checks|
 |0.0.1|2015-1-29|Initial version|
 

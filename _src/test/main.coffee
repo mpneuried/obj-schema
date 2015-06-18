@@ -1,62 +1,62 @@
 should = require('should')
 
-Schema = require( "../." ) 
+Schema = require( "../." )
 
 userValidator = null
 settingsValidator = null
 
-describe "----- obj-schema TESTS -----", ->
+describe "OBJ-SCHEMA -", ->
 
 	before ( done )->
 		settingsValidator = new Schema(
-			"a": 
+			"a":
 				type: "string"
 				required: true
 
-			"b": 
+			"b":
 				type: "number"
 		
 		, { name: "settings" } )
 
 		userValidator = new Schema(
-			"name": 
+			"name":
 				type: "string"
 				required: true
-				check: 
+				check:
 					operand: ">="
 					value: 4
 			
-			"nickname": 
+			"nickname":
 				type: "string"
-				check: 
+				check:
 					operand: "<"
 					value: 10
 					
-			"type": 
+			"type":
 				type: "string"
-				check: 
+				check:
 					operand: "eq"
 					value: 2
 
-			"sex": 
+			"sex":
 				type: "string"
 				regexp: /^(m|w)$/gi
 
-			"email": 
+			"email":
 				type: "email"
 			
-			"age": 
+			"age":
 				type: "number"
 				default: 42
-				check: 
+				check:
 					operand: ">"
 					value: 0
 
-			"comment": 
+			"comment":
 				type: "string"
 				striphtml: true
 
-			"tag": 
+			"tag":
 				type: "enum"
 				values: [ "A", "B", "C" ]
 
@@ -67,22 +67,22 @@ describe "----- obj-schema TESTS -----", ->
 				type: "schema"
 				schema: settingsValidator
 
-			"props": 
+			"props":
 				type: "object"
 
-			"active": 
+			"active":
 				type: "boolean"
 				default: true
 		
-			"checkA": 
+			"checkA":
 				type: "number"
-				check: 
+				check:
 					operand: "neq"
 					value: 23
 
-			"checkB": 
+			"checkB":
 				type: "number"
-				check: 
+				check:
 					operand: "eq"
 					value: 23
 
@@ -96,10 +96,10 @@ describe "----- obj-schema TESTS -----", ->
 		done()
 		return
 
-	describe 'Main Tests', ->
+	describe 'Main -', ->
 
 		it "success", ( done )->
-			_data = 
+			_data =
 				name: "John"
 				nickname: "johndoe"
 				type: "ab"
@@ -143,6 +143,10 @@ describe "----- obj-schema TESTS -----", ->
 			err.name.should.eql( "EVALIDATION_USER_REQUIRED_NAME" )
 			err.field.should.eql( "name" )
 			err.type.should.eql( "required" )
+			err.statusCode.should.eql( 406 )
+			err.customError.should.eql( true )
+			err.should.instanceof( Error )
+			console.log err.stack[0]
 			done()
 			return
 

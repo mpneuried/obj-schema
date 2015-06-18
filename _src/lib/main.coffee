@@ -12,10 +12,19 @@ moment = require( "moment-timezone" )
 sanitizer = require( "sanitizer" )
 htmlStrip = require('htmlstrip-native').html_strip
 
+class ObjSchemaError extends Error
+	statusCode: 406
+	customError: true
+	
+	constructor: ( @nane = @constructor.name, @message = "-" )->
+		@stack = (new Error).stack
+		return
+
+
 module.exports = class ObjSchema extends require( "mpbasic" )()
 
 	defaults: =>
-		_.extend super, 
+		_.extend super,
 			name: "data"
 
 	constructor: ( @schema, options )->
@@ -54,7 +63,7 @@ module.exports = class ObjSchema extends require( "mpbasic" )()
 					else
 						_val = data[ _k ] = def.default
 
-			switch def.type 
+			switch def.type
 
 				when "number"
 					if _val? and ( not _.isNumber( _val ) )
@@ -136,20 +145,18 @@ module.exports = class ObjSchema extends require( "mpbasic" )()
 				for _fkey in def.foreignReq when not data[ _fkey ]?
 					return @_error( "required", _fkey, @schema[ _fkey ] )
 
-		return null	
+		return null
 	
 	trim: ( str )->
 		return str.replace(/^\s+|\s+$/g, '')
 
 	_error: ( errtype, key, def, opt )=>
-		_err = new Error()
+		_err = new ObjSchemaError()
 		_err.name = "EVALIDATION_" + @config.name.toUpperCase() + "_" + errtype.toUpperCase() + "_" + key.toUpperCase()
 		_err.message = @msgs[ errtype ]?( { key: key, def: def, opt: opt } ) or "-"
-		_err.statusCode = 406
-		_err.customError = true
 		_err.type = errtype
 		_err.field = key
-		_err.opt = opt
+		_err.opt = opt if opt?
 		return _err
 	
 	_initMsgs: =>
@@ -158,7 +165,7 @@ module.exports = class ObjSchema extends require( "mpbasic" )()
 			@msgs[ key ] = _.template( msg )
 		return
 
-	_ERRORMSGS: 
+	_ERRORMSGS:
 		required: "Please define the value `<%= key %>`"
 		number: "The value in `<%= key %>` has to be a number"
 		string: "The value in `<%= key %>` has to be a string"
