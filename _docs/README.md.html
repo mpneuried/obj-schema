@@ -73,6 +73,9 @@
         <a href="#.validatecb(%20object%5B%2C%20cb%5D%20)">.validateCb( object[, cb] )</a>
       </div>
       <div class="heading h2">
+        <a href="#error">Error</a>
+      </div>
+      <div class="heading h2">
         <a href="#release%20history">Release History</a>
       </div>
       <div class="heading h2">
@@ -195,7 +198,7 @@ If the schema is configured to change the values it'll do this directly on the o
 <p>Check if the value is of type <code>number</code></p>
 
 <ul>
-<li><strong>check</strong>: <em>( <code>Object</code> )</em>: A configuration to chack the given value against a predefined value
+<li><strong>check</strong>: <em>( <code>Object</code> )</em>: A configuration to check the given value against a predefined value
 <ul><li><strong>check.operand</strong>: <em>( <code>String</code> enum: <code>eq</code>, <code>==</code>, <code>=</code>, <code>neq</code>, <code>!=</code>, <code>gt</code>, <code>&gt;</code>, <code>gte</code>, <code>&gt;=</code>, <code>lt</code>, <code>&lt;</code>, <code>lte</code>, <code>&lt;=</code> )</em>: the operand to use against</li>
 <li><strong>check.value</strong>: <em>( <code>Number</code> )</em> The value to check against</li></ul></li>
 </ul>
@@ -215,6 +218,11 @@ If the schema is configured to change the values it'll do this directly on the o
 <li><strong>regexp</strong>: <em>( <code>RegExp</code> )</em>: A regular expression to check against the value</li>
 <li><strong>sanitize</strong>: <em>( <code>Boolean</code> )</em>: sanitize this sting</li>
 <li><strong>striphtml</strong>: <em>( <code>Boolean</code> )</em>: strip all html tags out of the string</li>
+<li><p><strong>trim</strong>: <em>( <code>Boolean</code> )</em>: trim the string</p></li>
+<li><p><strong>check</strong>: <em>( <code>Object</code> )</em>: A configuration to check the given string. length against a predefined value</p>
+
+<ul><li><strong>check.operand</strong>: <em>( <code>String</code> enum: <code>eq</code>, <code>==</code>, <code>=</code>, <code>neq</code>, <code>!=</code>, <code>gt</code>, <code>&gt;</code>, <code>gte</code>, <code>&gt;=</code>, <code>lt</code>, <code>&lt;</code>, <code>lte</code>, <code>&lt;=</code> )</em>: the operand to use against</li>
+<li><strong>check.value</strong>: <em>( <code>Number</code> )</em> The string length to check against</li></ul></li>
 </ul>
 
 
@@ -388,6 +396,43 @@ If the schema is configured to change the values it'll do this directly on the o
 
 
 
+<div class="pilwrap" id="error">
+  <h2>
+    <a href="#error" name="error" class="pilcrow">&#182;</a>
+    Error
+  </h2>
+</div>
+
+
+<p>This module uses a custom Error ( <code>ObjSchemaError</code> ) to add some meta data to the validation error response.</p>
+
+<p><strong>Arguments</strong></p>
+
+<ul>
+<li><code>name</code> : <em>( <code>String</code> )</em>: The error name. Format: <code>EVALIDATION_{options.name}_{error-type}_{object-key}</code> E.g. <code>EVALIDATION_USER_REQUIRED_NAME</code></li>
+<li><code>message</code> : <em>( <code>String</code> )</em>: A human friendly error message. E.g. <code>Please define the value 'name'</code></li>
+<li><code>stack</code> : <em>( <code>String</code> )</em>: A error stack trace</li>
+<li><code>customError</code> : <em>( <code>Boolean</code> )</em>: A flag to define this error as a custom error. This is always <code>true</code>.</li>
+<li><code>statusCode</code> : <em>( <code>Number</code> )</em>: A http status code to use in http response</li>
+<li><code>def</code> : <em>( <code>Object</code> )</em>: the field definition. E.g. <code>{ type: "string", required: true }</code></li>
+<li><code>type</code> : <em>( <code>String</code> )</em>: The objects error type. <br />
+Possible error types:
+<ul><li><code>required</code> : Is required and not set</li>
+<li><code>number</code> : Is not a number</li>
+<li><code>string</code> : Is not a string</li>
+<li><code>boolean</code> : Is not boolean</li>
+<li><code>array</code> : Is not an array</li>
+<li><code>object</code> : Is not a object</li>
+<li><code>email</code> : Is not a email</li>
+<li><code>timezone</code> : Is not a moment timezone. see <a href="http://momentjs.com/timezone/">moment timezone</a></li>
+<li><code>regexp</code> : Doesn't match the regular expression</li>
+<li><code>enum</code> : Is not within the given list</li>
+<li><code>length</code> : The string length  isn't within the defined boundaries</li>
+<li><code>check</code> : The numeric value isn't within the defined boundaries</li></ul></li>
+<li><code>field</code> : <em>( <code>String</code> )</em>: The objects field the error occurred in. E.g. <code>name</code></li>
+</ul>
+
+
 <div class="pilwrap" id="release%20history">
   <h2>
     <a href="#release%20history" name="release%20history" class="pilcrow">&#182;</a>
@@ -398,7 +443,10 @@ If the schema is configured to change the values it'll do this directly on the o
 
 <p>|Version|Date|Description|
 |:--:|:--:|:--|
-|0.0.1|2015-1-29|Initial version|</p>
+|0.1.2|2015-06-19|Added field definition (key <code>def</code>) to error.|
+|0.1.1|2015-06-18|Better validation error with custom fields. optimized readme.|
+|0.1.0|2015-06-17|Added string trim, added string length checks|
+|0.0.1|2015-01-29|Initial version|</p>
 
 <p><a href="https://nodei.co/npm/obj-schema/"><img src="https://nodei.co/npm-dl/obj-schema.png?months=6" alt="NPM" title="" /></a></p>
 

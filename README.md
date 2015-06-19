@@ -176,6 +176,7 @@ This module uses a custom Error ( `ObjSchemaError` ) to add some meta data to th
 * `stack` : *( `String` )*: A error stack trace
 * `customError` : *( `Boolean` )*: A flag to define this error as a custom error. This is always `true`.
 * `statusCode` : *( `Number` )*: A http status code to use in http response
+* `def` : *( `Object` )*: the field definition. E.g. `{ type: "string", required: true }`
 * `type` : *( `String` )*: The objects error type.  
 Possible error types:
     * `required` : Is required and not set
@@ -196,9 +197,10 @@ Possible error types:
 ## Release History
 |Version|Date|Description|
 |:--:|:--:|:--|
-|0.1.1|2015-06-18|better validation error with custom fields. optimized readme.|
-|0.1.0|2015-06-17|added string trim, added string length checks|
-|0.0.1|2015-1-29|Initial version|
+|0.1.2|2015-06-19|Added field definition (key `def`) to error.|
+|0.1.1|2015-06-18|Better validation error with custom fields. optimized readme.|
+|0.1.0|2015-06-17|Added string trim, added string length checks|
+|0.0.1|2015-01-29|Initial version|
 
 [![NPM](https://nodei.co/npm-dl/obj-schema.png?months=6)](https://nodei.co/npm/obj-schema/)
 

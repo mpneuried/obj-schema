@@ -156,6 +156,7 @@ module.exports = class ObjSchema extends require( "mpbasic" )()
 		_err.message = @msgs[ errtype ]?( { key: key, def: def, opt: opt } ) or "-"
 		_err.type = errtype
 		_err.field = key
+		_err.def = def
 		_err.opt = opt if opt?
 		return _err
 	

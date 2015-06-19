@@ -146,7 +146,7 @@ describe "OBJ-SCHEMA -", ->
 			err.statusCode.should.eql( 406 )
 			err.customError.should.eql( true )
 			err.should.instanceof( Error )
-			console.log err.stack[0]
+			should.exist( err.def )
 			done()
 			return
 
@@ -256,6 +256,10 @@ describe "OBJ-SCHEMA -", ->
 			err = userValidator.validate( { name: "John", nickname: "johntheipsumdo", age: 0 } )
 			should.exist( err )
 			err.name.should.eql( "EVALIDATION_USER_LENGTH_NICKNAME" )
+			err.should.have.property( "def" )
+				.and.have.property( "check" )
+				.and.have.property( "value" )
+				.and.eql( 10 )
 			done()
 			return
 		
