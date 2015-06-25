@@ -122,7 +122,7 @@ describe "OBJ-SCHEMA -", ->
 			should.exist( _data.active )
 			_data.active.should.eql( false )
 			should.exist( _data.comment )
-			_data.comment.should.eql( "a  html  test" )
+			_data.comment.should.eql( "a html test" )
 			done()
 			return
 

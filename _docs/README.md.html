@@ -76,6 +76,9 @@
         <a href="#error">Error</a>
       </div>
       <div class="heading h2">
+        <a href="#testing">Testing</a>
+      </div>
+      <div class="heading h2">
         <a href="#release%20history">Release History</a>
       </div>
       <div class="heading h2">
@@ -217,7 +220,7 @@ If the schema is configured to change the values it'll do this directly on the o
 <ul>
 <li><strong>regexp</strong>: <em>( <code>RegExp</code> )</em>: A regular expression to check against the value</li>
 <li><strong>sanitize</strong>: <em>( <code>Boolean</code> )</em>: sanitize this sting</li>
-<li><strong>striphtml</strong>: <em>( <code>Boolean</code> )</em>: strip all html tags out of the string</li>
+<li><strong>striphtml</strong>: <em>( <code>Boolean|Array</code> )</em>: strip all html tags out of the string. You can use an array to define the allowed tags.</li>
 <li><p><strong>trim</strong>: <em>( <code>Boolean</code> )</em>: trim the string</p></li>
 <li><p><strong>check</strong>: <em>( <code>Object</code> )</em>: A configuration to check the given string. length against a predefined value</p>
 
@@ -433,6 +436,37 @@ Possible error types:
 </ul>
 
 
+<div class="pilwrap" id="testing">
+  <h2>
+    <a href="#testing" name="testing" class="pilcrow">&#182;</a>
+    Testing
+  </h2>
+</div>
+
+
+<p><strong>Node.js</strong></p>
+
+<p>To run the the node tests just call <code>grunt test</code> or <code>npm test</code>.</p>
+
+<p><strong>Browser</strong></p>
+
+<p>The browser test to use this module with browserify can simply executed with <strong><a href="https://github.com/alekseykulikov/browserify-test">browserify-test</a></strong></p>
+
+<p>install: <code>npm install -g browserify-test</code>.</p>
+
+<p>To test in browser just execute the following command within the project folder
+<code>browserify-test --watch ./test/main.js</code>
+Then follow the instructions ...</p>
+
+<p><strong>Headless</strong></p>
+
+<p>To test headless yo have to use is with phantomjs</p>
+
+<p>install: <code>npm install -g phantomjs</code></p>
+
+<p>execute test: <code>browserify-test ./test/main.js</code></p>
+
+
 <div class="pilwrap" id="release%20history">
   <h2>
     <a href="#release%20history" name="release%20history" class="pilcrow">&#182;</a>
@@ -443,6 +477,7 @@ Possible error types:
 
 <p>|Version|Date|Description|
 |:--:|:--:|:--|
+|0.2.0|2015-06-25|Changed strip tags module to be able to use this module with browserify|
 |0.1.2|2015-06-19|Added field definition (key <code>def</code>) to error.|
 |0.1.1|2015-06-18|Better validation error with custom fields. optimized readme.|
 |0.1.0|2015-06-17|Added string trim, added string length checks|

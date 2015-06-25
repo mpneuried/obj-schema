@@ -52,7 +52,7 @@ module.exports = (grunt) ->
 			main:
 				src: [ "test/main.js" ]
 				options:
-					env: 
+					env:
 						severity_heartbeat: "debug"
 		
 		

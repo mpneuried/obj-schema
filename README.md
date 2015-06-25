@@ -77,7 +77,7 @@ Check if the value is of type `string`
 
 - **regexp**: *( `RegExp` )*: A regular expression to check against the value
 - **sanitize**: *( `Boolean` )*: sanitize this sting
-- **striphtml**: *( `Boolean` )*: strip all html tags out of the string
+- **striphtml**: *( `Boolean|Array` )*: strip all html tags out of the string. You can use an array to define the allowed tags.
 - **trim**: *( `Boolean` )*: trim the string
 
 - **check**: *( `Object` )*: A configuration to check the given string. length against a predefined value
@@ -193,10 +193,35 @@ Possible error types:
     * `check` : The numeric value isn't within the defined boundaries
 * `field` : *( `String` )*: The objects field the error occurred in. E.g. `name`
 
+## Testing
+
+**Node.js**
+
+To run the the node tests just call `grunt test` or `npm test`.
+
+**Browser**
+
+The browser test to use this module with browserify can simply executed with **[browserify-test](https://github.com/alekseykulikov/browserify-test)**
+
+install: `npm install -g browserify-test`.
+
+To test in browser just execute the following command within the project folder
+`browserify-test --watch ./test/main.js`
+Then follow the instructions ...
+
+**Headless**
+
+To test headless yo have to use is with phantomjs
+
+install: `npm install -g phantomjs`
+
+execute test: `browserify-test ./test/main.js`
+
 
 ## Release History
 |Version|Date|Description|
 |:--:|:--:|:--|
+|0.2.0|2015-06-25|Changed strip tags module to be able to use this module with browserify|
 |0.1.2|2015-06-19|Added field definition (key `def`) to error.|
 |0.1.1|2015-06-18|Better validation error with custom fields. optimized readme.|
 |0.1.0|2015-06-17|Added string trim, added string length checks|

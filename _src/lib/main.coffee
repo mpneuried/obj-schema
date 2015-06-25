@@ -10,7 +10,7 @@
 _ = require( "lodash" )
 moment = require( "moment-timezone" )
 sanitizer = require( "sanitizer" )
-htmlStrip = require('htmlstrip-native').html_strip
+htmlStrip = require('js-striphtml')
 
 class ObjSchemaError extends Error
 	statusCode: 406
@@ -104,8 +104,11 @@ module.exports = class ObjSchema extends require( "mpbasic" )()
 			if _val? and def.type is "string" and def.sanitize
 				data[ _k ] = sanitizer.sanitize( data[ _k ] )
 				
-			if _val? and def.type is "string" and def.striphtml
-				data[ _k ] = htmlStrip( data[ _k ] )
+			if _val? and def.type is "string" and def.striphtml?
+				if _.isArray( def.striphtml )
+					data[ _k ] = htmlStrip.stripTags( data[ _k ], def.striphtml )
+				else
+					data[ _k ] = htmlStrip.stripTags( data[ _k ] )
 
 			if _val? and def.type is "string" and def.trim
 				data[ _k ] = @trim( data[ _k ] )
