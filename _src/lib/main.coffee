@@ -50,109 +50,126 @@ module.exports = class ObjSchema extends require( "mpbasic" )()
 			return _err
 
 		return _err
-
+	
+	validateMulti: ( data )=>
+		errors = []
+		for _k, def of @schema
+			[ err, _val ] = @_validateKey( _k, data[ _k ], def )
+			errors.push( err ) if err
+			data[ _k ] = _val
+			
+		if errors.length
+			return errors
+		else
+			return null
+	
 	validate: ( data )=>
 		for _k, def of @schema
-			_val = data[ _k ]
-			if def.required and not _val?
-				return @_error( "required", _k, def )
-			else if not _val?
-				if def.default?
-					if _.isFunction( def.default )
-						_val = data[ _k ] = def.default( data, def )
-					else
-						_val = data[ _k ] = def.default
-
-			switch def.type
-
-				when "number"
-					if _val? and ( not _.isNumber( _val ) )
-						return @_error( "number", _k, def )
-
-				when "array"
-					if _val? and ( not _.isArray( _val ) )
-						return @_error( "array", _k, def )
-
-				when "boolean"
-					if _val? and ( not _.isBoolean( _val ) )
-						return @_error( "boolean", _k, def )
-
-				when "object"
-					if _val? and ( not _.isObject( _val ) )
-						return @_error( "object", _k, def )
-
-				when "string", "enum"
-					if _val? and ( not _.isString( _val ) )
-						return @_error( "string", _k, def )
-
-				when "email"
-					if _val? and ( not _.isString( _val ) or not _val.match( @_validateEmailRegex ) )
-						return @_error( "email", _k, def )
-
-				when "timezone"
-					if _val? and ( not _.isString( _val ) or not moment.tz.zone( _val ) )
-						return @_error( "timezone", _k, def )
-
-				when "schema"
-					if _val? and _.isObject( _val ) and def.schema instanceof ObjSchema
-						_err = def.schema.validate( _val )
-						return _err if _err?
-
-			if _val? and def.type is "string" and _.isRegExp( def.regexp ) and not _val.match( def.regexp )
-				return @_error( "regexp", _k, def, { regexp: def.regexp.toString() } )
-
-			if _val? and def.type is "string" and def.sanitize
-				data[ _k ] = sanitizer.sanitize( data[ _k ] )
-				
-			if _val? and def.type is "string" and def.striphtml?
-				if _.isArray( def.striphtml )
-					data[ _k ] = htmlStrip.stripTags( data[ _k ], def.striphtml )
-				else
-					data[ _k ] = htmlStrip.stripTags( data[ _k ] )
-
-			if _val? and def.type is "string" and def.trim
-				data[ _k ] = @trim( data[ _k ] )
-
-			if _val? and def.type in [ "number", "string"]  and def.check?.operand? and def.check?.value?
-				if def.type is "string"
-					_ename = "length"
-					__val = _val.length
-				else
-					_ename = "check"
-					__val = _val
-				
-				switch def.check.operand.toLowerCase()
-					when "eq", "=", "=="
-						if __val isnt def.check.value
-							return @_error( _ename, _k, def, { "info": "not equal `#{def.check.value}`" } )
-					when "neq", "!="
-						if __val is def.check.value
-							return @_error( _ename, _k, def, { "info": "equal `#{def.check.value}`" } )
-					when "gt", ">"
-						if __val <= def.check.value
-							return @_error( _ename, _k, def, { "info": "to low" } )
-					when "gte", ">="
-						if __val < def.check.value
-							return @_error( _ename, _k, def, { "info": "to low" } )
-					when "lt", "<"
-						if __val >= def.check.value
-							return @_error( _ename, _k, def, { "info": "to high" } )
-					when "lte", "<="
-						if __val > def.check.value
-							return @_error( _ename, _k, def, { "info": "to high" } )
-			
-			if _val? and def.type is "enum" and def.values? and _val not in def.values
-				return @_error( "enum", _k, def, { values: def.values.join(", ") } )
-
-			if def.foreignReq? and _.isArray( def.foreignReq )
-				for _fkey in def.foreignReq when not data[ _fkey ]?
-					return @_error( "required", _fkey, @schema[ _fkey ] )
-
+			[ err, _val ] = @_validateKey( _k, data[ _k ], def )
+			return err if err?
+			data[ _k ] = _val
 		return null
 	
 	trim: ( str )->
 		return str.replace(/^\s+|\s+$/g, '')
 
+	_validateKey: ( key, val, def )=>
+		if def.required and not val?
+			return [ @_error( "required", key, def ), val ]
+		else if not val?
+			if def.default?
+				if _.isFunction( def.default )
+					val = def.default( data, def )
+				else
+					val = def.default
+
+		switch def.type
+
+			when "number"
+				if val? and ( not _.isNumber( val ) )
+					return [ @_error( "number", key, def ), val ]
+
+			when "array"
+				if val? and ( not _.isArray( val ) )
+					return [ @_error( "array", key, def ), val ]
+
+			when "boolean"
+				if val? and ( not _.isBoolean( val ) )
+					return [ @_error( "boolean", key, def ), val ]
+
+			when "object"
+				if val? and ( not _.isObject( val ) )
+					return [ @_error( "object", key, def ), val ]
+
+			when "string", "enum"
+				if val? and ( not _.isString( val ) )
+					return [ @_error( "string", key, def ), val ]
+
+			when "email"
+				if val? and ( not _.isString( val ) or not val.match( @_validateEmailRegex ) )
+					return [ @_error( "email", key, def ), val ]
+
+			when "timezone"
+				if val? and ( not _.isString( val ) or not moment.tz.zone( val ) )
+					return [ @_error( "timezone", key, def ), val ]
+
+			when "schema"
+				if val? and _.isObject( val ) and def.schema instanceof ObjSchema
+					_err = def.schema.validate( val )
+					return [ _err if _err?, val ]
+
+		if val? and def.type is "string" and _.isRegExp( def.regexp ) and not val.match( def.regexp )
+			return [ @_error( "regexp", key, def, { regexp: def.regexp.toString() } ), val ]
+
+		if val? and def.type is "string" and def.sanitize
+			val = sanitizer.sanitize( val )
+			
+		if val? and def.type is "string" and def.striphtml?
+			if _.isArray( def.striphtml )
+				val = htmlStrip.stripTags( val, def.striphtml )
+			else
+				val = htmlStrip.stripTags( val )
+
+		if val? and def.type is "string" and def.trim
+			val = @trim( val )
+
+		if val? and def.type in [ "number", "string"]  and def.check?.operand? and def.check?.value?
+			if def.type is "string"
+				_ename = "length"
+				_val = val.length
+			else
+				_ename = "check"
+				_val = val
+			
+			switch def.check.operand.toLowerCase()
+				when "eq", "=", "=="
+					if _val isnt def.check.value
+						return [ @_error( _ename, key, def, { "info": "not equal `#{def.check.value}`" } ), val ]
+				when "neq", "!="
+					if _val is def.check.value
+						return [ @_error( _ename, key, def, { "info": "equal `#{def.check.value}`" } ), val ]
+				when "gt", ">"
+					if _val <= def.check.value
+						return [ @_error( _ename, key, def, { "info": "to low" } ), val ]
+				when "gte", ">="
+					if _val < def.check.value
+						return [ @_error( _ename, key, def, { "info": "to low" } ), val ]
+				when "lt", "<"
+					if _val >= def.check.value
+						return [ @_error( _ename, key, def, { "info": "to high" } ), val ]
+				when "lte", "<="
+					if _val > def.check.value
+						return [ @_error( _ename, key, def, { "info": "to high" } ), val ]
+		
+		if val? and def.type is "enum" and def.values? and val not in def.values
+			return [ @_error( "enum", key, def, { values: def.values.join(", ") } ), val ]
+
+		if def.foreignReq? and _.isArray( def.foreignReq )
+			for _fkey in def.foreignReq when not data[ _fkey ]?
+				return [ @_error( "required", _fkey, @schema[ _fkey ] ), val ]
+				
+		return [ null, val ]
+		
 	_error: ( errtype, key, def, opt )=>
 		_err = new ObjSchemaError()
 		_err.name = "EVALIDATION_" + @config.name.toUpperCase() + "_" + errtype.toUpperCase() + "_" + key.toUpperCase()

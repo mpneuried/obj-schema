@@ -67,6 +67,9 @@
         <a href="#.validate(%20object%20)">.validate( object )</a>
       </div>
       <div class="heading h3">
+        <a href="#.validatemulti(%20object%20)">.validateMulti( object )</a>
+      </div>
+      <div class="heading h3">
         <a href="#.keys()">.keys()</a>
       </div>
       <div class="heading h3">
@@ -331,7 +334,7 @@ If the schema is configured to change the values it'll do this directly on the o
 </div>
 
 
-<p>The main validation method</p>
+<p>Validate the data obj and stop on the first error</p>
 
 <p><strong>Arguments</strong></p>
 
@@ -342,6 +345,27 @@ If the schema is configured to change the values it'll do this directly on the o
 <p><strong>Return</strong></p>
 
 <p><em>( Null|Error )</em>: Returns <code>null</code> on success and an error if the validation failed. </p>
+
+
+<div class="pilwrap" id=".validatemulti(%20object%20)">
+  <h3>
+    <a href="#.validatemulti(%20object%20)" name=".validatemulti(%20object%20)" class="pilcrow">&#182;</a>
+    <code>.validateMulti( object )</code>
+  </h3>
+</div>
+
+
+<p>Validate the data obj and return an array of errors</p>
+
+<p><strong>Arguments</strong></p>
+
+<ul>
+<li><code>object</code> : <em>( <code>Object</code> required )</em>: The object to validate against the schema</li>
+</ul>
+
+<p><strong>Return</strong></p>
+
+<p><em>( Null|Error[] )</em>: Returns <code>null</code> on success and an array of errors if the validation failed. </p>
 
 
 <div class="pilwrap" id=".keys()">

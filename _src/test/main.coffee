@@ -1,4 +1,5 @@
 should = require('should')
+_ = require('lodash')
 
 Schema = require( "../." )
 
@@ -275,6 +276,25 @@ describe "OBJ-SCHEMA -", ->
 			should.exist( err )
 			err.name.should.eql( "EVALIDATION_USER_LENGTH_TYPE" )
 			err.type.should.eql( "length" )
+			done()
+			return
+			
+		it "faling with callback", ( done )->
+			err = userValidator.validateCb { name: "John", type: "abc", age: 0 }, ( err )->
+				should.exist( err )
+				err.name.should.eql( "EVALIDATION_USER_LENGTH_TYPE" )
+				err.type.should.eql( "length" )
+				done()
+				return
+			return
+		
+			
+		it "faling string", ( done )->
+			errors = userValidator.validateMulti( { name: "x", type: "x", age: 0 } )
+			should.exist( errors )
+			errors.should.have.length( 3 )
+			_.pluck( errors, "field" ).should.containDeep(["name", "type", "age"])
+			_.pluck( errors, "name" ).should.containDeep(["EVALIDATION_USER_LENGTH_NAME", "EVALIDATION_USER_LENGTH_TYPE", "EVALIDATION_USER_CHECK_AGE"])
 			done()
 			return
 

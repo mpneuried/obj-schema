@@ -120,7 +120,7 @@ Check if the value is of type `string` and is a valid [moment timezone](http://m
 
 ### `.validate( object )`
 
-The main validation method
+Validate the data obj and stop on the first error
 
 **Arguments**
 
@@ -129,6 +129,18 @@ The main validation method
 **Return**
 
 *( Null|Error )*: Returns `null` on success and an error if the validation failed. 
+
+### `.validateMulti( object )`
+
+Validate the data obj and return an array of errors
+
+**Arguments**
+
+* `object` : *( `Object` required )*: The object to validate against the schema
+
+**Return**
+
+*( Null|Error[] )*: Returns `null` on success and an array of errors if the validation failed. 
 
 ### `.keys()`
 
@@ -221,6 +233,7 @@ execute test: `browserify-test ./test/main.js`
 ## Release History
 |Version|Date|Description|
 |:--:|:--:|:--|
+|0.3.0|2015-06-26|added method `.validateMulti()` retrieve all validation errors at once|
 |0.2.0|2015-06-25|Changed strip tags module to be able to use this module with browserify|
 |0.1.2|2015-06-19|Added field definition (key `def`) to error.|
 |0.1.1|2015-06-18|Better validation error with custom fields. optimized readme.|
