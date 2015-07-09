@@ -59,9 +59,9 @@ If the schema is configured to change the values it'll do this directly on the o
 
 - **type**: *( `String` )*: The data type for detailed validation. All availible types will be described below.
 - **required**: *( `Boolean` )*: This key is required
-- **default**: *( `Any|Function` )*: A default value or a function to generate the default. This function will receive the arguments `( data, def )`. `data` = the whole object to validate; `def` = the current schema type config.
-- **foreignReq**: *( `String[]` )*: is only valid if the keys within this list exists
-
+- **default**: *( `Any|Function` )*: A default value or a function to generate the default. This function will receive the arguments `( key, val, data, options )`. `data` = the whole object to validate; `def` = the current schema type config.
+- **foreignReq**: *( `String[]` )*: Is only valid if the keys within this list exists
+- **fnSkip**: *( `Function` )*: A function to determine if a validation should be skipped. As a return it expects a boolean. The arguments passed to the function are `( key, val, data, options )`.
 
 #### `number`
 
@@ -118,29 +118,57 @@ Check if the value is of type `string` and is a valid [moment timezone](http://m
 
 ## Methods
 
-### `.validate( object )`
+### `.validate( object[, options] )`
 
 Validate the data obj and stop on the first error
 
 **Arguments**
 
 * `object` : *( `Object` required )*: The object to validate against the schema
+* `options` : *( `Any` optional )*: options that will be passed to the schema functions `fnSkip`
 
 **Return**
 
 *( Null|Error )*: Returns `null` on success and an error if the validation failed. 
 
-### `.validateMulti( object )`
+**Example**
+
+```js
+	function create( data, cb ){
+		var error = uservalidator.validate( data )
+		if( error ){
+			// handle the error
+		}else{{
+			// do your stuff
+		}
+	}
+```
+
+### `.validateMulti( object[, options] )`
 
 Validate the data obj and return an array of errors
 
 **Arguments**
 
 * `object` : *( `Object` required )*: The object to validate against the schema
+* `options` : *( `Any` optional )*: options that will be passed to the schema functions `fnSkip`
 
 **Return**
 
-*( Null|Error[] )*: Returns `null` on success and an array of errors if the validation failed. 
+**Example**
+
+```js
+	function create( data, cb ){
+		var errors = uservalidator.validateMulti( data )
+		if( errors ){
+			// handle the array of errors
+		}else{{
+			// do your stuff
+		}
+	}
+```
+
+*( Null|[]Error )*: Returns `null` on success and an array of errors if the validation failed. 
 
 ### `.keys()`
 
@@ -150,7 +178,7 @@ Returns an array of all keys within the schema.
 
 *( Array )*: Schema keys.
 
-### `.validateCb( object[, cb] )`
+### `.validateCb( object[, options][, cb] )`
 
 A helper method to use it with a callback. 
 
@@ -162,6 +190,7 @@ A helper method to use it with a callback.
 
 * `object` : *( `Object` required )*: The object to validate against the schema
 * `cb` : *( `Object` required )*: The object to validate against the schema
+* `options` : *( `Any` optional )*: options that will be passed to the schema functions `fnSkip`
 
 **Return**
 
@@ -171,9 +200,9 @@ A helper method to use it with a callback.
 
 ```js
 	function create( data, cb ){
-		if( !uservalidator( data, cb )){
+		uservalidator.validateCb( data, function( err, data ){
 			// do your stuff
-		}
+		});
 	}
 ```
 
@@ -205,6 +234,10 @@ Possible error types:
     * `check` : The numeric value isn't within the defined boundaries
 * `field` : *( `String` )*: The objects field the error occurred in. E.g. `name`
 
+## Advanced example
+
+This example in `example.js`. shows how to use the custom functions.
+
 ## Testing
 
 **Node.js**
@@ -229,10 +262,55 @@ install: `npm install -g phantomjs`
 
 execute test: `browserify-test ./test/main.js`
 
+## Breaking Changes
+
+### Upgrade to `1.x`
+
+The arguments for the `default` function changed.
+A migration is only necessary if you used functions to calc the `default` on the fly.
+
+**Old:**
+
+Arguments: `( data, def )`
+
+```js
+
+var defaultName = function( data, def ){
+    return "autogen-" + data.id;
+};
+
+var uservalidator = new Schema( {
+    name: {
+        type: "string",
+        default: defaultName
+    }
+}, { name: "user" });
+```
+
+**New:**
+
+Arguments: `( key, val, data, options )`
+
+```js
+
+var defaultName = function( key, val, data, options ){
+    return "autogen-" + data.id;
+};
+
+var uservalidator = new Schema( {
+    name: {
+        type: "string",
+        default: defaultName
+    }
+}, { name: "user" });
+
+```
 
 ## Release History
+
 |Version|Date|Description|
 |:--:|:--:|:--|
+|1.0.0|2015-07-09|added method `.validateKey()` to validate only one key. Added `fnSkip` definition method. Added optional options, that will be passed to the functions `fnSkip` and `default`. Changed arguments of default function. |
 |0.3.0|2015-06-26|added method `.validateMulti()` retrieve all validation errors at once|
 |0.2.0|2015-06-25|Changed strip tags module to be able to use this module with browserify|
 |0.1.2|2015-06-19|Added field definition (key `def`) to error.|

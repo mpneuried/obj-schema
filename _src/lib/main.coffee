@@ -37,7 +37,7 @@ module.exports = class ObjSchema extends require( "mpbasic" )()
 
 	_validateEmailRegex: /^(?:[\w\!\#\$\%\&\'\*\+\-\/\=\?\^\`\{\|\}\~]+\.)*[\w\!\#\$\%\&\'\*\+\-\/\=\?\^\`\{\|\}\~]+@(?:(?:(?:[a-zA-Z0-9](?:[a-zA-Z0-9\-](?!\.)){0,61}[a-zA-Z0-9]?\.)+[a-zA-Z0-9](?:[a-zA-Z0-9\-](?!$)){0,61}[a-zA-Z0-9]?)|(?:\[(?:(?:[01]?\d{1,2}|2[0-4]\d|25[0-5])\.){3}(?:[01]?\d{1,2}|2[0-4]\d|25[0-5])\]))$/
 
-	validateCb: ( data, cb )=>
+	validateCb: ( [data, options]..., cb )=>
 		_err = @validate( data )
 		if not _err?
 			return
@@ -51,37 +51,47 @@ module.exports = class ObjSchema extends require( "mpbasic" )()
 
 		return _err
 	
-	validateMulti: ( data )=>
+	validateMulti: ( data, options )=>
 		errors = []
 		for _k, def of @schema
-			[ err, _val ] = @_validateKey( _k, data[ _k ], def )
+			[ err, _val ] = @_validateKey( _k, data[ _k ], def, data, options )
 			errors.push( err ) if err
-			data[ _k ] = _val
 			
 		if errors.length
 			return errors
 		else
 			return null
 	
-	validate: ( data )=>
+	validate: ( data, options )=>
 		for _k, def of @schema
-			[ err, _val ] = @_validateKey( _k, data[ _k ], def )
+			[ err, _val ] = @_validateKey( _k, data[ _k ], def, data, options )
 			return err if err?
-			data[ _k ] = _val
 		return null
+	
+	validateKey: ( key, val, options )=>
+		if not @schema[ key ]
+			return null
+		[ err, _val ] = @_validateKey( key, val, @schema[ key ], null, options )
+		if err?
+			return err
+		return _val
 	
 	trim: ( str )->
 		return str.replace(/^\s+|\s+$/g, '')
 
-	_validateKey: ( key, val, def )=>
+	_validateKey: ( key, val, def, data, options )=>
+		if _.isFunction( def.fnSkip ) and def.fnSkip( key, val, data, options )
+			return [ null, val ]
+		
 		if def.required and not val?
 			return [ @_error( "required", key, def ), val ]
 		else if not val?
 			if def.default?
 				if _.isFunction( def.default )
-					val = def.default( data, def )
+					val = def.default( key, val, data, options )
 				else
 					val = def.default
+				data[ key ] = val if data?
 
 		switch def.type
 
@@ -123,15 +133,18 @@ module.exports = class ObjSchema extends require( "mpbasic" )()
 
 		if val? and def.type is "string" and def.sanitize
 			val = sanitizer.sanitize( val )
+			data[ key ] = val if data?
 			
 		if val? and def.type is "string" and def.striphtml?
 			if _.isArray( def.striphtml )
 				val = htmlStrip.stripTags( val, def.striphtml )
 			else
 				val = htmlStrip.stripTags( val )
+			data[ key ] = val if data?
 
 		if val? and def.type is "string" and def.trim
 			val = @trim( val )
+			data[ key ] = val if data?
 
 		if val? and def.type in [ "number", "string"]  and def.check?.operand? and def.check?.value?
 			if def.type is "string"

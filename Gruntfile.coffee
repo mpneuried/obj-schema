@@ -7,6 +7,10 @@ module.exports = (grunt) ->
 				files: ["_src/**/*.coffee"]
 				tasks: [ "coffee:changed" ]
 			
+			dev:
+				files: ["_src/**/*.coffee"]
+				tasks: [ "coffee:changed", "test" ]
+			
 		coffee:
 			changed:
 				expand: true
@@ -71,6 +75,10 @@ module.exports = (grunt) ->
 					js: []
 					css: []
 					extras: []
+					
+		exec: 
+			start_atom:
+				command: "atom ."
 		
 
 	# Load npm modules
@@ -80,17 +88,19 @@ module.exports = (grunt) ->
 	grunt.loadNpmTasks "grunt-mocha-cli"
 	grunt.loadNpmTasks "grunt-include-replace"
 	grunt.loadNpmTasks "grunt-docker"
+	grunt.loadNpmTasks "grunt-exec"
 
 	# just a hack until this issue has been fixed: https://github.com/yeoman/grunt-regarde/issues/3
 	grunt.option('force', not grunt.option('force'))
 	
 	# ALIAS TASKS
-	grunt.registerTask "watch", "regarde"
+	grunt.registerTask "watch", "regarde:module"
 	grunt.registerTask "default", "build"
 	grunt.registerTask "docs", "docker"
 	grunt.registerTask "clear", [ "clean:base" ]
 	grunt.registerTask "test", [ "mochacli:main" ]
+	grunt.registerTask "dev", [ "exec:start_atom", "build", "test", "regarde:dev" ]
 
 	# build the project
 	grunt.registerTask "build", [ "clear", "coffee:base", "includereplace" ]
-	grunt.registerTask "build-dev", [ "clear", "coffee:base", "docs", "test" ]
+	grunt.registerTask "release", [ "clear", "coffee:base", "docs", "test" ]

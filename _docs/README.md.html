@@ -64,22 +64,31 @@
         <a href="#methods">Methods</a>
       </div>
       <div class="heading h3">
-        <a href="#.validate(%20object%20)">.validate( object )</a>
+        <a href="#.validate(%20object%5B%2C%20options%5D%20)">.validate( object[, options] )</a>
       </div>
       <div class="heading h3">
-        <a href="#.validatemulti(%20object%20)">.validateMulti( object )</a>
+        <a href="#.validatemulti(%20object%5B%2C%20options%5D%20)">.validateMulti( object[, options] )</a>
       </div>
       <div class="heading h3">
         <a href="#.keys()">.keys()</a>
       </div>
       <div class="heading h3">
-        <a href="#.validatecb(%20object%5B%2C%20cb%5D%20)">.validateCb( object[, cb] )</a>
+        <a href="#.validatecb(%20object%5B%2C%20options%5D%5B%2C%20cb%5D%20)">.validateCb( object[, options][, cb] )</a>
       </div>
       <div class="heading h2">
         <a href="#error">Error</a>
       </div>
       <div class="heading h2">
+        <a href="#advanced%20example">Advanced example</a>
+      </div>
+      <div class="heading h2">
         <a href="#testing">Testing</a>
+      </div>
+      <div class="heading h2">
+        <a href="#breaking%20changes">Breaking Changes</a>
+      </div>
+      <div class="heading h3">
+        <a href="#upgrade%20to%201.x">Upgrade to 1.x</a>
       </div>
       <div class="heading h2">
         <a href="#release%20history">Release History</a>
@@ -188,8 +197,9 @@ If the schema is configured to change the values it'll do this directly on the o
 <ul>
 <li><strong>type</strong>: <em>( <code>String</code> )</em>: The data type for detailed validation. All availible types will be described below.</li>
 <li><strong>required</strong>: <em>( <code>Boolean</code> )</em>: This key is required</li>
-<li><strong>default</strong>: <em>( <code>Any|Function</code> )</em>: A default value or a function to generate the default. This function will receive the arguments <code>( data, def )</code>. <code>data</code> = the whole object to validate; <code>def</code> = the current schema type config.</li>
-<li><strong>foreignReq</strong>: <em>( <code>String[]</code> )</em>: is only valid if the keys within this list exists</li>
+<li><strong>default</strong>: <em>( <code>Any|Function</code> )</em>: A default value or a function to generate the default. This function will receive the arguments <code>( key, val, data, options )</code>. <code>data</code> = the whole object to validate; <code>def</code> = the current schema type config.</li>
+<li><strong>foreignReq</strong>: <em>( <code>String[]</code> )</em>: Is only valid if the keys within this list exists</li>
+<li><strong>fnSkip</strong>: <em>( <code>Function</code> )</em>: A function to determine if a validation should be skipped. As a return it expects a boolean. The arguments passed to the function are <code>( key, val, data, options )</code>.</li>
 </ul>
 
 
@@ -326,10 +336,10 @@ If the schema is configured to change the values it'll do this directly on the o
 
 
 
-<div class="pilwrap" id=".validate(%20object%20)">
+<div class="pilwrap" id=".validate(%20object%5B%2C%20options%5D%20)">
   <h3>
-    <a href="#.validate(%20object%20)" name=".validate(%20object%20)" class="pilcrow">&#182;</a>
-    <code>.validate( object )</code>
+    <a href="#.validate(%20object%5B%2C%20options%5D%20)" name=".validate(%20object%5B%2C%20options%5D%20)" class="pilcrow">&#182;</a>
+    <code>.validate( object[, options] )</code>
   </h3>
 </div>
 
@@ -340,17 +350,33 @@ If the schema is configured to change the values it'll do this directly on the o
 
 <ul>
 <li><code>object</code> : <em>( <code>Object</code> required )</em>: The object to validate against the schema</li>
+<li><code>options</code> : <em>( <code>Any</code> optional )</em>: options that will be passed to the schema functions <code>fnSkip</code></li>
 </ul>
 
 <p><strong>Return</strong></p>
 
 <p><em>( Null|Error )</em>: Returns <code>null</code> on success and an error if the validation failed. </p>
 
+<p><strong>Example</strong></p>
 
-<div class="pilwrap" id=".validatemulti(%20object%20)">
+
+<div class="highlight"><pre><code>    <span class="kd">function</span> <span class="nx">create</span><span class="p">(</span> <span class="nx">data</span><span class="p">,</span> <span class="nx">cb</span> <span class="p">){</span>
+        <span class="kd">var</span> <span class="nx">error</span> <span class="o">=</span> <span class="nx">uservalidator</span><span class="p">.</span><span class="nx">validate</span><span class="p">(</span> <span class="nx">data</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="nx">error</span> <span class="p">){</span>
+            <span class="c1">// handle the error</span>
+        <span class="p">}</span><span class="k">else</span><span class="p">{{</span>
+            <span class="c1">// do your stuff</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+</code></pre></div>
+
+
+
+
+<div class="pilwrap" id=".validatemulti(%20object%5B%2C%20options%5D%20)">
   <h3>
-    <a href="#.validatemulti(%20object%20)" name=".validatemulti(%20object%20)" class="pilcrow">&#182;</a>
-    <code>.validateMulti( object )</code>
+    <a href="#.validatemulti(%20object%5B%2C%20options%5D%20)" name=".validatemulti(%20object%5B%2C%20options%5D%20)" class="pilcrow">&#182;</a>
+    <code>.validateMulti( object[, options] )</code>
   </h3>
 </div>
 
@@ -361,11 +387,27 @@ If the schema is configured to change the values it'll do this directly on the o
 
 <ul>
 <li><code>object</code> : <em>( <code>Object</code> required )</em>: The object to validate against the schema</li>
+<li><code>options</code> : <em>( <code>Any</code> optional )</em>: options that will be passed to the schema functions <code>fnSkip</code></li>
 </ul>
 
 <p><strong>Return</strong></p>
 
-<p><em>( Null|Error[] )</em>: Returns <code>null</code> on success and an array of errors if the validation failed. </p>
+<p><strong>Example</strong></p>
+
+
+<div class="highlight"><pre><code>    <span class="kd">function</span> <span class="nx">create</span><span class="p">(</span> <span class="nx">data</span><span class="p">,</span> <span class="nx">cb</span> <span class="p">){</span>
+        <span class="kd">var</span> <span class="nx">errors</span> <span class="o">=</span> <span class="nx">uservalidator</span><span class="p">.</span><span class="nx">validateMulti</span><span class="p">(</span> <span class="nx">data</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="nx">errors</span> <span class="p">){</span>
+            <span class="c1">// handle the array of errors</span>
+        <span class="p">}</span><span class="k">else</span><span class="p">{{</span>
+            <span class="c1">// do your stuff</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+</code></pre></div>
+
+
+
+<p><em>( Null|[]Error )</em>: Returns <code>null</code> on success and an array of errors if the validation failed. </p>
 
 
 <div class="pilwrap" id=".keys()">
@@ -383,10 +425,10 @@ If the schema is configured to change the values it'll do this directly on the o
 <p><em>( Array )</em>: Schema keys.</p>
 
 
-<div class="pilwrap" id=".validatecb(%20object%5B%2C%20cb%5D%20)">
+<div class="pilwrap" id=".validatecb(%20object%5B%2C%20options%5D%5B%2C%20cb%5D%20)">
   <h3>
-    <a href="#.validatecb(%20object%5B%2C%20cb%5D%20)" name=".validatecb(%20object%5B%2C%20cb%5D%20)" class="pilcrow">&#182;</a>
-    <code>.validateCb( object[, cb] )</code>
+    <a href="#.validatecb(%20object%5B%2C%20options%5D%5B%2C%20cb%5D%20)" name=".validatecb(%20object%5B%2C%20options%5D%5B%2C%20cb%5D%20)" class="pilcrow">&#182;</a>
+    <code>.validateCb( object[, options][, cb] )</code>
   </h3>
 </div>
 
@@ -404,6 +446,7 @@ If the schema is configured to change the values it'll do this directly on the o
 <ul>
 <li><code>object</code> : <em>( <code>Object</code> required )</em>: The object to validate against the schema</li>
 <li><code>cb</code> : <em>( <code>Object</code> required )</em>: The object to validate against the schema</li>
+<li><code>options</code> : <em>( <code>Any</code> optional )</em>: options that will be passed to the schema functions <code>fnSkip</code></li>
 </ul>
 
 <p><strong>Return</strong></p>
@@ -414,9 +457,9 @@ If the schema is configured to change the values it'll do this directly on the o
 
 
 <div class="highlight"><pre><code>    <span class="kd">function</span> <span class="nx">create</span><span class="p">(</span> <span class="nx">data</span><span class="p">,</span> <span class="nx">cb</span> <span class="p">){</span>
-        <span class="k">if</span><span class="p">(</span> <span class="o">!</span><span class="nx">uservalidator</span><span class="p">(</span> <span class="nx">data</span><span class="p">,</span> <span class="nx">cb</span> <span class="p">)){</span>
+        <span class="nx">uservalidator</span><span class="p">.</span><span class="nx">validateCb</span><span class="p">(</span> <span class="nx">data</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span> <span class="nx">err</span><span class="p">,</span> <span class="nx">data</span> <span class="p">){</span>
             <span class="c1">// do your stuff</span>
-        <span class="p">}</span>
+        <span class="p">});</span>
     <span class="p">}</span>
 </code></pre></div>
 
@@ -460,6 +503,17 @@ Possible error types:
 </ul>
 
 
+<div class="pilwrap" id="advanced%20example">
+  <h2>
+    <a href="#advanced%20example" name="advanced%20example" class="pilcrow">&#182;</a>
+    Advanced example
+  </h2>
+</div>
+
+
+<p>This example in <code>example.js</code>. shows how to use the custom functions.</p>
+
+
 <div class="pilwrap" id="testing">
   <h2>
     <a href="#testing" name="testing" class="pilcrow">&#182;</a>
@@ -491,6 +545,65 @@ Then follow the instructions ...</p>
 <p>execute test: <code>browserify-test ./test/main.js</code></p>
 
 
+<div class="pilwrap" id="breaking%20changes">
+  <h2>
+    <a href="#breaking%20changes" name="breaking%20changes" class="pilcrow">&#182;</a>
+    Breaking Changes
+  </h2>
+</div>
+
+
+
+<div class="pilwrap" id="upgrade%20to%201.x">
+  <h3>
+    <a href="#upgrade%20to%201.x" name="upgrade%20to%201.x" class="pilcrow">&#182;</a>
+    Upgrade to <code>1.x</code>
+  </h3>
+</div>
+
+
+<p>The arguments for the <code>default</code> function changed.
+A migration is only necessary if you used functions to calc the <code>default</code> on the fly.</p>
+
+<p><strong>Old:</strong></p>
+
+<p>Arguments: <code>( data, def )</code></p>
+
+
+<div class="highlight"><pre><code><span class="kd">var</span> <span class="nx">defaultName</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span> <span class="nx">data</span><span class="p">,</span> <span class="nx">def</span> <span class="p">){</span>
+    <span class="k">return</span> <span class="s2">&quot;autogen-&quot;</span> <span class="o">+</span> <span class="nx">data</span><span class="p">.</span><span class="nx">id</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="kd">var</span> <span class="nx">uservalidator</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Schema</span><span class="p">(</span> <span class="p">{</span>
+    <span class="nx">name</span><span class="o">:</span> <span class="p">{</span>
+        <span class="nx">type</span><span class="o">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+        <span class="k">default</span><span class="o">:</span> <span class="nx">defaultName</span>
+    <span class="p">}</span>
+<span class="p">},</span> <span class="p">{</span> <span class="nx">name</span><span class="o">:</span> <span class="s2">&quot;user&quot;</span> <span class="p">});</span>
+</code></pre></div>
+
+
+
+<p><strong>New:</strong></p>
+
+<p>Arguments: <code>( key, val, data, options )</code></p>
+
+
+<div class="highlight"><pre><code><span class="kd">var</span> <span class="nx">defaultName</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span> <span class="nx">key</span><span class="p">,</span> <span class="nx">val</span><span class="p">,</span> <span class="nx">data</span><span class="p">,</span> <span class="nx">options</span> <span class="p">){</span>
+    <span class="k">return</span> <span class="s2">&quot;autogen-&quot;</span> <span class="o">+</span> <span class="nx">data</span><span class="p">.</span><span class="nx">id</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="kd">var</span> <span class="nx">uservalidator</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Schema</span><span class="p">(</span> <span class="p">{</span>
+    <span class="nx">name</span><span class="o">:</span> <span class="p">{</span>
+        <span class="nx">type</span><span class="o">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+        <span class="k">default</span><span class="o">:</span> <span class="nx">defaultName</span>
+    <span class="p">}</span>
+<span class="p">},</span> <span class="p">{</span> <span class="nx">name</span><span class="o">:</span> <span class="s2">&quot;user&quot;</span> <span class="p">});</span>
+</code></pre></div>
+
+
+
+
 <div class="pilwrap" id="release%20history">
   <h2>
     <a href="#release%20history" name="release%20history" class="pilcrow">&#182;</a>
@@ -501,6 +614,8 @@ Then follow the instructions ...</p>
 
 <p>|Version|Date|Description|
 |:--:|:--:|:--|
+|1.0.0|2015-07-09|added method <code>.validateKey()</code> to validate only one key. Added <code>fnSkip</code> definition method. Added optional options, that will be passed to the functions <code>fnSkip</code> and <code>default</code>. Changed arguments of default function. |
+|0.3.0|2015-06-26|added method <code>.validateMulti()</code> retrieve all validation errors at once|
 |0.2.0|2015-06-25|Changed strip tags module to be able to use this module with browserify|
 |0.1.2|2015-06-19|Added field definition (key <code>def</code>) to error.|
 |0.1.1|2015-06-18|Better validation error with custom fields. optimized readme.|

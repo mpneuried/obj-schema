@@ -299,4 +299,119 @@ describe "OBJ-SCHEMA -", ->
 			return
 
 		return
+		
+	describe 'Single Key -', ->
+		it "successfull validate a single key", ( done )->
+			res = userValidator.validateKey( "name", "John" )
+			should.exist( res )
+			res.should.not.instanceof( Error )
+			res.should.eql( "John" )
+			done()
+			return
+		
+		it "failing validate a single key", ( done )->
+			res = userValidator.validateKey( "name", "J." )
+			should.exist( res )
+			res.should.instanceof( Error )
+			res.name.should.eql( "EVALIDATION_USER_LENGTH_NAME" )
+			res.type.should.eql( "length" )
+			done()
+			return
+		
+		it "validate a unkown key", ( done )->
+			res = userValidator.validateKey( "wat", "J." )
+			should.not.exist( res )
+			done()
+			return
+			
+		it "generate default", ( done )->
+			res = userValidator.validateKey( "age", null )
+			should.exist( res )
+			res.should.not.instanceof( Error )
+			res.should.eql( 42 )
+			done()
+			return
+			
+		it "strip html", ( done )->
+			res = userValidator.validateKey( "comment", "<b>abc</b><div class=\"test\">XYZ</div>" )
+			should.exist( res )
+			res.should.not.instanceof( Error )
+			res.should.eql( "abcXYZ" )
+			done()
+			return
+		return
+	
+	describe 'Custom functions -', ->
+		
+		fnSkipId = ( key, val, data, options )->
+			return options.type isnt "create"
+		
+		fnDefaultAge = ( key, val, data, options )->
+			return data.name.length * ( options.factor or 13 )
+		
+		fnDefaultName = ( key, val, data, options )->
+			return "autogen-" + data.id
+			
+		userValidatorFn = new Schema({
+			id:
+				required: true,
+				type: "number",
+				fnSkip: fnSkipId
+			name:
+				type: "string",
+				default: fnDefaultName
+			email:
+				type: "email"
+			age:
+				default: fnDefaultAge
+		}, { name: "user" })
+		
+		
+		it "successfull validate with fnSkip", ( done )->
+			_data = { id: 123, name: "John", email: "john@do.com", age: 23 }
+			err = userValidatorFn.validate( _data, { type: "create" } )
+			should.not.exist( err )
+			should.exist( _data.age )
+			_data.age.should.eql( 23 )
+			done()
+			return
+			
+		it "failing validate with fnSkip", ( done )->
+			_data = { name: "John", email: "john@do.com" }
+			err = userValidatorFn.validate( _data, { type: "create" } )
+			should.exist( err )
+			err.name.should.eql( "EVALIDATION_USER_REQUIRED_ID" )
+			done()
+			return
+		
+		it "success validate with fnSkip with differnt type", ( done )->
+			_data = { name: "John", email: "john@do.com" }
+			err = userValidatorFn.validate( _data, { type: "update" } )
+			should.not.exist( err )
+			should.exist( _data.age )
+			_data.age.should.eql( 52 )
+			done()
+			return
+		
+		it "success modify age default", ( done )->
+			_data = { name: "John", email: "john@do.com" }
+			err = userValidatorFn.validate( _data, { type: "update", factor: 23 } )
+			should.not.exist( err )
+			should.exist( _data.age )
+			_data.age.should.eql( 92 )
+			done()
+			return
+		
+		it "success modify name default", ( done )->
+			_data = { id: 123, email: "john@do.com" }
+			err = userValidatorFn.validate( _data, { type: "create" } )
+			should.not.exist( err )
+			
+			_expName = "autogen-123"
+			_data.should.have.property( "age" )
+				.and.eql( _expName.length * 13 )
+			_data.should.have.property( "name" )
+				.and.eql( _expName )
+			done()
+			return
 	return
