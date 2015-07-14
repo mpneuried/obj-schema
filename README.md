@@ -246,7 +246,7 @@ This module uses a custom Error ( `ObjSchemaError` ) to add some meta data to th
 * `customError` : *( `Boolean` )*: A flag to define this error as a custom error. This is always `true`.
 * `statusCode` : *( `Number` )*: A http status code to use in http response
 * `def` : *( `Object` )*: the field definition. E.g. `{ type: "string", required: true }`
-* `check` : *( `Object` )*: if it's an error type `check` this is the relevant data. `{ operand: "gte", value: 23 }`
+* `check` : *( `Object` )*: if it's an error type `check` this is the relevant data. `{ operand: "gte", value: 23 }`. The operand will be reduced to the values `eq,neq,gt,gte,lt,lte,between`.
 * `type` : *( `String` )*: The objects error type.  
 Possible error types:
     * `required` : Is required and not set
@@ -339,6 +339,7 @@ var uservalidator = new Schema( {
 
 |Version|Date|Description|
 |:--:|:--:|:--|
+|1.1.1|2015-07-14|reduced error check operand to the values `eq,neq,gt,gte,lt,lte,between`|
 |1.1.0|2015-07-14|added check mode `between|btw|><` to check a string length or numeric value.|
 |1.0.0|2015-07-09|added method `.validateKey()` to validate only one key. Added `fnSkip` definition method. Added optional options, that will be passed to the functions `fnSkip` and `default`. Changed arguments of default function. |
 |0.3.0|2015-06-26|added method `.validateMulti()` retrieve all validation errors at once|

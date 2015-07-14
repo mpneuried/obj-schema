@@ -157,25 +157,25 @@ module.exports = class ObjSchema extends require( "mpbasic" )()
 			switch def.check.operand.toLowerCase()
 				when "eq", "=", "=="
 					if _val isnt def.check.value
-						return [ @_error( _ename, key, def, { check: def.check, "info": "not equal `#{def.check.value}`" } ), val ]
+						return [ @_error( _ename, key, def, { check: { operand: "eq", value: def.check.value }, "info": "not equal `#{def.check.value}`" } ), val ]
 				when "neq", "!="
 					if _val is def.check.value
-						return [ @_error( _ename, key, def, { check: def.check, "info": "equal `#{def.check.value}`" } ), val ]
+						return [ @_error( _ename, key, def, { check: { operand: "neq", value: def.check.value }, "info": "equal `#{def.check.value}`" } ), val ]
 				when "gt", ">"
 					if _val <= def.check.value
-						return [ @_error( _ename, key, def, { check: def.check, "info": "to low" } ), val ]
+						return [ @_error( _ename, key, def, { check: { operand: "gt", value: def.check.value }, "info": "to low" } ), val ]
 				when "gte", ">="
 					if _val < def.check.value
-						return [ @_error( _ename, key, def, { check: def.check, "info": "to low" } ), val ]
+						return [ @_error( _ename, key, def, { check: { operand: "gte", value: def.check.value }, "info": "to low" } ), val ]
 				when "lt", "<"
 					if _val >= def.check.value
-						return [ @_error( _ename, key, def, { check: def.check, "info": "to high" } ), val ]
+						return [ @_error( _ename, key, def, { check: { operand: "lt", value: def.check.value }, "info": "to high" } ), val ]
 				when "lte", "<="
 					if _val > def.check.value
-						return [ @_error( _ename, key, def, { check: def.check, "info": "to high" } ), val ]
+						return [ @_error( _ename, key, def, { check: { operand: "lte", value: def.check.value }, "info": "to high" } ), val ]
 				when "between", "btw", "><"
 					if _.isArray( def.check?.value ) and def.check.value.length is 2 and ( _val < def.check.value[0] or _val > def.check.value[1] )
-						return [ @_error( _ename, key, def, { check: def.check, "info": "not between `#{def.check.value[0]}` and `#{def.check.value[0]}`" } ), val ]
+						return [ @_error( _ename, key, def, { check: { operand: "between", value: def.check.value }, "info": "not between `#{def.check.value[0]}` and `#{def.check.value[0]}`" } ), val ]
 		
 		if val? and def.type is "enum" and def.values? and val not in def.values
 			return [ @_error( "enum", key, def, { values: def.values.join(", ") } ), val ]
