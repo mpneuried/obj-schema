@@ -53,6 +53,12 @@ describe "OBJ-SCHEMA -", ->
 					operand: ">"
 					value: 0
 
+			"money":
+				type: "number"
+				check:
+					operand: "btw"
+					value: [1000,5000]
+
 			"comment":
 				type: "string"
 				striphtml: true
@@ -112,6 +118,7 @@ describe "OBJ-SCHEMA -", ->
 				settings: { a: "foo" }
 				props: { foo: "bar" }
 				active: false
+				money: 1001
 				checkA: 42
 				checkB: 23
 				comment: "a <b>html</b> test"
@@ -288,13 +295,40 @@ describe "OBJ-SCHEMA -", ->
 				return
 			return
 		
-			
 		it "faling string", ( done )->
 			errors = userValidator.validateMulti( { name: "x", type: "x", age: 0 } )
 			should.exist( errors )
 			errors.should.have.length( 3 )
 			_.pluck( errors, "field" ).should.containDeep(["name", "type", "age"])
 			_.pluck( errors, "name" ).should.containDeep(["EVALIDATION_USER_LENGTH_NAME", "EVALIDATION_USER_LENGTH_TYPE", "EVALIDATION_USER_CHECK_AGE"])
+			done()
+			return
+
+		it "faling between too low", ( done )->
+			err = userValidator.validate( { name: "John", type: "ab", money: 666 } )
+			should.exist( err )
+			err.name.should.eql( "EVALIDATION_USER_CHECK_MONEY" )
+			err.type.should.eql( "check" )
+			done()
+			return
+
+		it "faling between too high", ( done )->
+			err = userValidator.validate( { name: "John", type: "ab", money: 6666 } )
+			should.exist( err )
+			err.name.should.eql( "EVALIDATION_USER_CHECK_MONEY" )
+			err.type.should.eql( "check" )
+			done()
+			return
+
+		it "between bottom boundary", ( done )->
+			err = userValidator.validate( { name: "John", type: "ab", money: 1000 } )
+			should.not.exist( err )
+			done()
+			return
+
+		it "between bottom boundary", ( done )->
+			err = userValidator.validate( { name: "John", type: "ab", money: 5000 } )
+			should.not.exist( err )
 			done()
 			return
 

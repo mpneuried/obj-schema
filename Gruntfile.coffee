@@ -94,7 +94,7 @@ module.exports = (grunt) ->
 	grunt.option('force', not grunt.option('force'))
 	
 	# ALIAS TASKS
-	grunt.registerTask "watch", "regarde:module"
+	grunt.registerTask "watch", ["build", "test", "regarde:dev"]
 	grunt.registerTask "default", "build"
 	grunt.registerTask "docs", "docker"
 	grunt.registerTask "clear", [ "clean:base" ]
