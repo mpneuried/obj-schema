@@ -335,10 +335,15 @@ var uservalidator = new Schema( {
 
 ```
 
+## TODO
+
+- add custom checks or plugins: this is useful to remove moment-timezone from the dependencies. So a core and plugin concept would be useful to add the checks `timezone`, `sanitizer` and `htmlstrip` 
+
 ## Release History
 
 |Version|Date|Description|
 |:--:|:--:|:--|
+|1.1.2|2015-07-31|removed dependency `mpbasic` for a smaller footprint within browserify|
 |1.1.1|2015-07-14|reduced error check operand to the values `eq,neq,gt,gte,lt,lte,between`|
 |1.1.0|2015-07-14|added check mode `between|btw|><` to check a string length or numeric value.|
 |1.0.0|2015-07-09|added method `.validateKey()` to validate only one key. Added `fnSkip` definition method. Added optional options, that will be passed to the functions `fnSkip` and `default`. Changed arguments of default function. |
