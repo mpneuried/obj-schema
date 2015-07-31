@@ -31,7 +31,6 @@
   },
   "license": "MIT",
   "dependencies": {
-    "mpbasic": "0.0.x",
     "lodash": "3.9.x",
     "moment-timezone": "0.4.x",
     "sanitizer": "0.1.x",

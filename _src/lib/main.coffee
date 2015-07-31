@@ -21,14 +21,16 @@ class ObjSchemaError extends Error
 		return
 
 
-module.exports = class ObjSchema extends require( "mpbasic" )()
+module.exports = class ObjSchema
 
 	defaults: =>
-		_.extend super,
-			name: "data"
+		name: "data"
 
 	constructor: ( @schema, options )->
-		super( options )
+		
+		@config = @defaults()
+		@config.name = options.name if options.name?
+		
 		@_initMsgs()
 		return
 
