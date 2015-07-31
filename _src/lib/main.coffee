@@ -159,22 +159,25 @@ module.exports = class ObjSchema
 			switch def.check.operand.toLowerCase()
 				when "eq", "=", "=="
 					if _val isnt def.check.value
-						return [ @_error( _ename, key, def, { "info": "not equal `#{def.check.value}`" } ), val ]
+						return [ @_error( _ename, key, def, { check: { operand: "eq", value: def.check.value }, "info": "not equal `#{def.check.value}`" } ), val ]
 				when "neq", "!="
 					if _val is def.check.value
-						return [ @_error( _ename, key, def, { "info": "equal `#{def.check.value}`" } ), val ]
+						return [ @_error( _ename, key, def, { check: { operand: "neq", value: def.check.value }, "info": "equal `#{def.check.value}`" } ), val ]
 				when "gt", ">"
 					if _val <= def.check.value
-						return [ @_error( _ename, key, def, { "info": "to low" } ), val ]
+						return [ @_error( _ename, key, def, { check: { operand: "gt", value: def.check.value }, "info": "to low" } ), val ]
 				when "gte", ">="
 					if _val < def.check.value
-						return [ @_error( _ename, key, def, { "info": "to low" } ), val ]
+						return [ @_error( _ename, key, def, { check: { operand: "gte", value: def.check.value }, "info": "to low" } ), val ]
 				when "lt", "<"
 					if _val >= def.check.value
-						return [ @_error( _ename, key, def, { "info": "to high" } ), val ]
+						return [ @_error( _ename, key, def, { check: { operand: "lt", value: def.check.value }, "info": "to high" } ), val ]
 				when "lte", "<="
 					if _val > def.check.value
-						return [ @_error( _ename, key, def, { "info": "to high" } ), val ]
+						return [ @_error( _ename, key, def, { check: { operand: "lte", value: def.check.value }, "info": "to high" } ), val ]
+				when "between", "btw", "><"
+					if _.isArray( def.check?.value ) and def.check.value.length is 2 and ( _val < def.check.value[0] or _val > def.check.value[1] )
+						return [ @_error( _ename, key, def, { check: { operand: "between", value: def.check.value }, "info": "not between `#{def.check.value[0]}` and `#{def.check.value[0]}`" } ), val ]
 		
 		if val? and def.type is "enum" and def.values? and val not in def.values
 			return [ @_error( "enum", key, def, { values: def.values.join(", ") } ), val ]
@@ -191,8 +194,9 @@ module.exports = class ObjSchema
 		_err.message = @msgs[ errtype ]?( { key: key, def: def, opt: opt } ) or "-"
 		_err.type = errtype
 		_err.field = key
+		_err.check = opt.check if opt?.check?
 		_err.def = def
-		_err.opt = opt if opt?
+		#_err.opt = opt if opt?
 		return _err
 	
 	_initMsgs: =>
