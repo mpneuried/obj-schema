@@ -67,7 +67,10 @@
         <a href="#.validate(%20object%5B%2C%20options%5D%20)">.validate( object[, options] )</a>
       </div>
       <div class="heading h3">
-        <a href="#.validatemulti(%20object%5B%2C%20options%5D%20)">.validateMulti( object[, options] )</a>
+        <a href="#.validate(%20object%5B%2C%20options%5D%20)">.validate( object[, options] )</a>
+      </div>
+      <div class="heading h3">
+        <a href="#.validatekey(%20key%2C%20value%5B%2C%20options%5D%20)">.validateKey( key, value[, options] )</a>
       </div>
       <div class="heading h3">
         <a href="#.keys()">.keys()</a>
@@ -89,6 +92,9 @@
       </div>
       <div class="heading h3">
         <a href="#upgrade%20to%201.x">Upgrade to 1.x</a>
+      </div>
+      <div class="heading h2">
+        <a href="#todo">TODO</a>
       </div>
       <div class="heading h2">
         <a href="#release%20history">Release History</a>
@@ -215,8 +221,8 @@ If the schema is configured to change the values it'll do this directly on the o
 
 <ul>
 <li><strong>check</strong>: <em>( <code>Object</code> )</em>: A configuration to check the given value against a predefined value
-<ul><li><strong>check.operand</strong>: <em>( <code>String</code> enum: <code>eq</code>, <code>==</code>, <code>=</code>, <code>neq</code>, <code>!=</code>, <code>gt</code>, <code>&gt;</code>, <code>gte</code>, <code>&gt;=</code>, <code>lt</code>, <code>&lt;</code>, <code>lte</code>, <code>&lt;=</code> )</em>: the operand to use against</li>
-<li><strong>check.value</strong>: <em>( <code>Number</code> )</em> The value to check against</li></ul></li>
+<ul><li><strong>check.operand</strong>: <em>( <code>String</code> enum: <code>eq</code>, <code>==</code>, <code>=</code>, <code>neq</code>, <code>!=</code>, <code>gt</code>, <code>&gt;</code>, <code>gte</code>, <code>&gt;=</code>, <code>lt</code>, <code>&lt;</code>, <code>lte</code>, <code>&lt;=</code>, <code>between</code>, <code>btw</code>, <code>&gt;&lt;</code> )</em>: the operand to use against.</li>
+<li><strong>check.value</strong>: <em>( <code>Number|Array</code> )</em> The value to check against. In case of a between an array size two is required (eg. [{low},{high}])</li></ul></li>
 </ul>
 
 
@@ -237,8 +243,8 @@ If the schema is configured to change the values it'll do this directly on the o
 <li><p><strong>trim</strong>: <em>( <code>Boolean</code> )</em>: trim the string</p></li>
 <li><p><strong>check</strong>: <em>( <code>Object</code> )</em>: A configuration to check the given string. length against a predefined value</p>
 
-<ul><li><strong>check.operand</strong>: <em>( <code>String</code> enum: <code>eq</code>, <code>==</code>, <code>=</code>, <code>neq</code>, <code>!=</code>, <code>gt</code>, <code>&gt;</code>, <code>gte</code>, <code>&gt;=</code>, <code>lt</code>, <code>&lt;</code>, <code>lte</code>, <code>&lt;=</code> )</em>: the operand to use against</li>
-<li><strong>check.value</strong>: <em>( <code>Number</code> )</em> The string length to check against</li></ul></li>
+<ul><li><strong>check.operand</strong>: <em>( <code>String</code> enum: <code>eq</code>, <code>==</code>, <code>=</code>, <code>neq</code>, <code>!=</code>, <code>gt</code>, <code>&gt;</code>, <code>gte</code>, <code>&gt;=</code>, <code>lt</code>, <code>&lt;</code>, <code>lte</code>, <code>&lt;=</code>, <code>between</code>, <code>btw</code>, <code>&gt;&lt;</code> )</em>: the operand to use against.</li>
+<li><strong>check.value</strong>: <em>( <code>Number|Array</code> )</em> The value to check against. In case of a between an array size two is required (eg. [{low},{high}])</li></ul></li>
 </ul>
 
 
@@ -350,7 +356,7 @@ If the schema is configured to change the values it'll do this directly on the o
 
 <ul>
 <li><code>object</code> : <em>( <code>Object</code> required )</em>: The object to validate against the schema</li>
-<li><code>options</code> : <em>( <code>Any</code> optional )</em>: options that will be passed to the schema functions <code>fnSkip</code></li>
+<li><code>options</code> : <em>( <code>Any</code> optional )</em>: options that will be passed to the schema functions <code>fnSkip</code> and <code>default</code>. See <code>example.js</code>.</li>
 </ul>
 
 <p><strong>Return</strong></p>
@@ -373,21 +379,59 @@ If the schema is configured to change the values it'll do this directly on the o
 
 
 
-<div class="pilwrap" id=".validatemulti(%20object%5B%2C%20options%5D%20)">
+<div class="pilwrap" id=".validate(%20object%5B%2C%20options%5D%20)_1">
   <h3>
-    <a href="#.validatemulti(%20object%5B%2C%20options%5D%20)" name=".validatemulti(%20object%5B%2C%20options%5D%20)" class="pilcrow">&#182;</a>
-    <code>.validateMulti( object[, options] )</code>
+    <a href="#.validate(%20object%5B%2C%20options%5D%20)_1" name=".validate(%20object%5B%2C%20options%5D%20)_1" class="pilcrow">&#182;</a>
+    <code>.validate( object[, options] )</code>
   </h3>
 </div>
 
 
-<p>Validate the data obj and return an array of errors</p>
+<p>Validate the data obj and stop on the first error</p>
 
 <p><strong>Arguments</strong></p>
 
 <ul>
 <li><code>object</code> : <em>( <code>Object</code> required )</em>: The object to validate against the schema</li>
-<li><code>options</code> : <em>( <code>Any</code> optional )</em>: options that will be passed to the schema functions <code>fnSkip</code></li>
+<li><code>options</code> : <em>( <code>Any</code> optional )</em>: options that will be passed to the schema functions <code>fnSkip</code> and <code>default</code>. See <code>example.js</code>.</li>
+</ul>
+
+<p><strong>Return</strong></p>
+
+<p><em>( Null|Error )</em>: Returns <code>null</code> on success and an error if the validation failed. </p>
+
+<p><strong>Example</strong></p>
+
+
+<div class="highlight"><pre><code>    <span class="kd">function</span> <span class="nx">create</span><span class="p">(</span> <span class="nx">data</span><span class="p">,</span> <span class="nx">cb</span> <span class="p">){</span>
+        <span class="kd">var</span> <span class="nx">error</span> <span class="o">=</span> <span class="nx">uservalidator</span><span class="p">.</span><span class="nx">validate</span><span class="p">(</span> <span class="nx">data</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="nx">error</span> <span class="p">){</span>
+            <span class="c1">// handle the error</span>
+        <span class="p">}</span><span class="k">else</span><span class="p">{{</span>
+            <span class="c1">// do your stuff</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+</code></pre></div>
+
+
+
+
+<div class="pilwrap" id=".validatekey(%20key%2C%20value%5B%2C%20options%5D%20)">
+  <h3>
+    <a href="#.validatekey(%20key%2C%20value%5B%2C%20options%5D%20)" name=".validatekey(%20key%2C%20value%5B%2C%20options%5D%20)" class="pilcrow">&#182;</a>
+    <code>.validateKey( key, value[, options] )</code>
+  </h3>
+</div>
+
+
+<p>Validate olny one single key</p>
+
+<p><strong>Arguments</strong></p>
+
+<ul>
+<li><code>key</code> : <em>( <code>String</code> required )</em>: The schema key to validate</li>
+<li><code>value</code> : <em>( <code>Any</code> required )</em>: the data to validate</li>
+<li><code>options</code> : <em>( <code>Any</code> optional )</em>: options that will be passed to the schema functions <code>fnSkip</code> and <code>default</code>. See <code>example.js</code>.</li>
 </ul>
 
 <p><strong>Return</strong></p>
@@ -446,7 +490,7 @@ If the schema is configured to change the values it'll do this directly on the o
 <ul>
 <li><code>object</code> : <em>( <code>Object</code> required )</em>: The object to validate against the schema</li>
 <li><code>cb</code> : <em>( <code>Object</code> required )</em>: The object to validate against the schema</li>
-<li><code>options</code> : <em>( <code>Any</code> optional )</em>: options that will be passed to the schema functions <code>fnSkip</code></li>
+<li><code>options</code> : <em>( <code>Any</code> optional )</em>: options that will be passed to the schema functions <code>fnSkip</code> and <code>default</code>. See <code>example.js</code>.</li>
 </ul>
 
 <p><strong>Return</strong></p>
@@ -485,6 +529,7 @@ If the schema is configured to change the values it'll do this directly on the o
 <li><code>customError</code> : <em>( <code>Boolean</code> )</em>: A flag to define this error as a custom error. This is always <code>true</code>.</li>
 <li><code>statusCode</code> : <em>( <code>Number</code> )</em>: A http status code to use in http response</li>
 <li><code>def</code> : <em>( <code>Object</code> )</em>: the field definition. E.g. <code>{ type: "string", required: true }</code></li>
+<li><code>check</code> : <em>( <code>Object</code> )</em>: if it's an error type <code>check</code> this is the relevant data. <code>{ operand: "gte", value: 23 }</code>. The operand will be reduced to the values <code>eq,neq,gt,gte,lt,lte,between</code>.</li>
 <li><code>type</code> : <em>( <code>String</code> )</em>: The objects error type. <br />
 Possible error types:
 <ul><li><code>required</code> : Is required and not set</li>
@@ -604,6 +649,19 @@ A migration is only necessary if you used functions to calc the <code>default</c
 
 
 
+<div class="pilwrap" id="todo">
+  <h2>
+    <a href="#todo" name="todo" class="pilcrow">&#182;</a>
+    TODO
+  </h2>
+</div>
+
+
+<ul>
+<li>add custom checks or plugins: this is useful to remove moment-timezone from the dependencies. So a core and plugin concept would be useful to add the checks <code>timezone</code>, <code>sanitizer</code> and <code>htmlstrip</code> </li>
+</ul>
+
+
 <div class="pilwrap" id="release%20history">
   <h2>
     <a href="#release%20history" name="release%20history" class="pilcrow">&#182;</a>
@@ -614,6 +672,10 @@ A migration is only necessary if you used functions to calc the <code>default</c
 
 <p>|Version|Date|Description|
 |:--:|:--:|:--|
+|1.1.3|2016-03-08|updated dependencies. Especially lodash to version 4|
+|1.1.2|2015-07-31|removed dependency <code>mpbasic</code> for a smaller footprint within browserify|
+|1.1.1|2015-07-14|reduced error check operand to the values <code>eq,neq,gt,gte,lt,lte,between</code>|
+|1.1.0|2015-07-14|added check mode <code>between|btw|&gt;&lt;</code> to check a string length or numeric value.|
 |1.0.0|2015-07-09|added method <code>.validateKey()</code> to validate only one key. Added <code>fnSkip</code> definition method. Added optional options, that will be passed to the functions <code>fnSkip</code> and <code>default</code>. Changed arguments of default function. |
 |0.3.0|2015-06-26|added method <code>.validateMulti()</code> retrieve all validation errors at once|
 |0.2.0|2015-06-25|Changed strip tags module to be able to use this module with browserify|

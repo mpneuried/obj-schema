@@ -7,7 +7,16 @@
 #
 # Main Module
 # 
-_ = require( "lodash" )
+_isFunction = require( "lodash/isFunction" )
+_isNumber = require( "lodash/isNumber" )
+_isArray = require( "lodash/isArray" )
+_isBoolean = require( "lodash/isBoolean" )
+_isObject = require( "lodash/isObject" )
+_isString = require( "lodash/isString" )
+_isObject = require( "lodash/isObject" )
+_isRegExp = require( "lodash/isRegExp" )
+_template = require( "lodash/template" )
+
 moment = require( "moment-timezone" )
 sanitizer = require( "sanitizer" )
 htmlStrip = require('js-striphtml')
@@ -23,7 +32,7 @@ class ObjSchemaError extends Error
 
 module.exports = class ObjSchema
 
-	defaults: =>
+	defaults: ->
 		name: "data"
 
 	constructor: ( @schema, options )->
@@ -47,7 +56,7 @@ module.exports = class ObjSchema
 		if not cb?
 			throw _err
 
-		if _.isFunction( cb )
+		if _isFunction( cb )
 			cb( _err )
 			return _err
 
@@ -82,14 +91,14 @@ module.exports = class ObjSchema
 		return str.replace(/^\s+|\s+$/g, '')
 
 	_validateKey: ( key, val, def, data, options )=>
-		if _.isFunction( def.fnSkip ) and def.fnSkip( key, val, data, options )
+		if _isFunction( def.fnSkip ) and def.fnSkip( key, val, data, options )
 			return [ null, val ]
 		
 		if def.required and not val?
 			return [ @_error( "required", key, def ), val ]
 		else if not val?
 			if def.default?
-				if _.isFunction( def.default )
+				if _isFunction( def.default )
 					val = def.default( key, val, data, options )
 				else
 					val = def.default
@@ -98,39 +107,39 @@ module.exports = class ObjSchema
 		switch def.type
 
 			when "number"
-				if val? and ( not _.isNumber( val ) )
+				if val? and ( not _isNumber( val ) )
 					return [ @_error( "number", key, def ), val ]
 
 			when "array"
-				if val? and ( not _.isArray( val ) )
+				if val? and ( not _isArray( val ) )
 					return [ @_error( "array", key, def ), val ]
 
 			when "boolean"
-				if val? and ( not _.isBoolean( val ) )
+				if val? and ( not _isBoolean( val ) )
 					return [ @_error( "boolean", key, def ), val ]
 
 			when "object"
-				if val? and ( not _.isObject( val ) )
+				if val? and ( not _isObject( val ) )
 					return [ @_error( "object", key, def ), val ]
 
 			when "string", "enum"
-				if val? and ( not _.isString( val ) )
+				if val? and ( not _isString( val ) )
 					return [ @_error( "string", key, def ), val ]
 
 			when "email"
-				if val? and ( not _.isString( val ) or not val.match( @_validateEmailRegex ) )
+				if val? and ( not _isString( val ) or not val.match( @_validateEmailRegex ) )
 					return [ @_error( "email", key, def ), val ]
 
 			when "timezone"
-				if val? and ( not _.isString( val ) or not moment.tz.zone( val ) )
+				if val? and ( not _isString( val ) or not moment.tz.zone( val ) )
 					return [ @_error( "timezone", key, def ), val ]
 
 			when "schema"
-				if val? and _.isObject( val ) and def.schema instanceof ObjSchema
+				if val? and _isObject( val ) and def.schema instanceof ObjSchema
 					_err = def.schema.validate( val )
 					return [ _err if _err?, val ]
 
-		if val? and def.type is "string" and _.isRegExp( def.regexp ) and not val.match( def.regexp )
+		if val? and def.type is "string" and _isRegExp( def.regexp ) and not val.match( def.regexp )
 			return [ @_error( "regexp", key, def, { regexp: def.regexp.toString() } ), val ]
 
 		if val? and def.type is "string" and def.sanitize
@@ -138,7 +147,7 @@ module.exports = class ObjSchema
 			data[ key ] = val if data?
 			
 		if val? and def.type is "string" and def.striphtml?
-			if _.isArray( def.striphtml )
+			if _isArray( def.striphtml )
 				val = htmlStrip.stripTags( val, def.striphtml )
 			else
 				val = htmlStrip.stripTags( val )
@@ -176,13 +185,13 @@ module.exports = class ObjSchema
 					if _val > def.check.value
 						return [ @_error( _ename, key, def, { check: { operand: "lte", value: def.check.value }, "info": "to high" } ), val ]
 				when "between", "btw", "><"
-					if _.isArray( def.check?.value ) and def.check.value.length is 2 and ( _val < def.check.value[0] or _val > def.check.value[1] )
+					if _isArray( def.check?.value ) and def.check.value.length is 2 and ( _val < def.check.value[0] or _val > def.check.value[1] )
 						return [ @_error( _ename, key, def, { check: { operand: "between", value: def.check.value }, "info": "not between `#{def.check.value[0]}` and `#{def.check.value[0]}`" } ), val ]
 		
 		if val? and def.type is "enum" and def.values? and val not in def.values
 			return [ @_error( "enum", key, def, { values: def.values.join(", ") } ), val ]
 
-		if def.foreignReq? and _.isArray( def.foreignReq )
+		if def.foreignReq? and _isArray( def.foreignReq )
 			for _fkey in def.foreignReq when not data[ _fkey ]?
 				return [ @_error( "required", _fkey, @schema[ _fkey ] ), val ]
 				
@@ -202,7 +211,7 @@ module.exports = class ObjSchema
 	_initMsgs: =>
 		@msgs = {}
 		for key, msg of @_ERRORMSGS
-			@msgs[ key ] = _.template( msg )
+			@msgs[ key ] = _template( msg )
 		return
 
 	_ERRORMSGS:

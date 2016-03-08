@@ -343,6 +343,7 @@ var uservalidator = new Schema( {
 
 |Version|Date|Description|
 |:--:|:--:|:--|
+|1.1.3|2016-03-08|updated dependencies. Especially lodash to version 4|
 |1.1.2|2015-07-31|removed dependency `mpbasic` for a smaller footprint within browserify|
 |1.1.1|2015-07-14|reduced error check operand to the values `eq,neq,gt,gte,lt,lte,between`|
 |1.1.0|2015-07-14|added check mode `between|btw|><` to check a string length or numeric value.|

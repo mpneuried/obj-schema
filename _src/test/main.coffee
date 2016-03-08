@@ -1,5 +1,5 @@
 should = require('should')
-_ = require('lodash')
+_map = require('lodash/map')
 
 Schema = require( "../." )
 
@@ -80,6 +80,12 @@ describe "OBJ-SCHEMA -", ->
 			"active":
 				type: "boolean"
 				default: true
+			
+			"flagA":
+				type: "boolean"
+				
+			"flagB":
+				type: "boolean"
 		
 			"checkA":
 				type: "number"
@@ -121,6 +127,8 @@ describe "OBJ-SCHEMA -", ->
 				money: 1001
 				checkA: 42
 				checkB: 23
+				flagA: false
+				flagB: true
 				comment: "a <b>html</b> test"
 
 			err = userValidator.validate( _data )
@@ -129,6 +137,8 @@ describe "OBJ-SCHEMA -", ->
 			_data.age.should.eql( 23 )
 			should.exist( _data.active )
 			_data.active.should.eql( false )
+			_data.flagA.should.eql( false )
+			_data.flagB.should.eql( true )
 			should.exist( _data.comment )
 			_data.comment.should.eql( "a html test" )
 			done()
@@ -225,42 +235,42 @@ describe "OBJ-SCHEMA -", ->
 			done()
 			return
 
-		it "faling number check", ( done )->
+		it "failing number check", ( done )->
 			err = userValidator.validate( { name: "John", email: "john@do.com", age: 0 } )
 			should.exist( err )
 			err.name.should.eql( "EVALIDATION_USER_CHECK_AGE" )
 			done()
 			return
 
-		it "faling number check eq", ( done )->
+		it "failing number check eq", ( done )->
 			err = userValidator.validate( { name: "John", email: "john@do.com", checkA: 23 } )
 			should.exist( err )
 			err.name.should.eql( "EVALIDATION_USER_CHECK_CHECKA" )
 			done()
 			return
 
-		it "faling number check neq", ( done )->
+		it "failing number check neq", ( done )->
 			err = userValidator.validate( { name: "John", email: "john@do.com", checkB: 42 } )
 			should.exist( err )
 			err.name.should.eql( "EVALIDATION_USER_CHECK_CHECKB" )
 			done()
 			return
 
-		it "faling number regex", ( done )->
+		it "failing number regex", ( done )->
 			err = userValidator.validate( { name: "John", sex: "X" } )
 			should.exist( err )
 			err.name.should.eql( "EVALIDATION_USER_REGEXP_SEX" )
 			done()
 			return
 		
-		it "faling string length too low", ( done )->
+		it "failing string length too low", ( done )->
 			err = userValidator.validate( { name: "Jo", email: "john@do.com", age: 0 } )
 			should.exist( err )
 			err.name.should.eql( "EVALIDATION_USER_LENGTH_NAME" )
 			done()
 			return
 		
-		it "faling string length too high", ( done )->
+		it "failing string length too high", ( done )->
 			err = userValidator.validate( { name: "John", nickname: "johntheipsumdo", age: 0 } )
 			should.exist( err )
 			err.name.should.eql( "EVALIDATION_USER_LENGTH_NICKNAME" )
@@ -271,14 +281,14 @@ describe "OBJ-SCHEMA -", ->
 			done()
 			return
 		
-		it "faling string length neq - low", ( done )->
+		it "failing string length neq - low", ( done )->
 			err = userValidator.validate( { name: "John", type: "x", age: 0 } )
 			should.exist( err )
 			err.name.should.eql( "EVALIDATION_USER_LENGTH_TYPE" )
 			done()
 			return
 		
-		it "faling string length neq - high", ( done )->
+		it "failing string length neq - high", ( done )->
 			err = userValidator.validate( { name: "John", type: "abc", age: 0 } )
 			should.exist( err )
 			err.name.should.eql( "EVALIDATION_USER_LENGTH_TYPE" )
@@ -286,7 +296,7 @@ describe "OBJ-SCHEMA -", ->
 			done()
 			return
 			
-		it "faling with callback", ( done )->
+		it "failing with callback", ( done )->
 			err = userValidator.validateCb { name: "John", type: "abc", age: 0 }, ( err )->
 				should.exist( err )
 				err.name.should.eql( "EVALIDATION_USER_LENGTH_TYPE" )
@@ -295,16 +305,16 @@ describe "OBJ-SCHEMA -", ->
 				return
 			return
 		
-		it "faling string", ( done )->
+		it "failing string", ( done )->
 			errors = userValidator.validateMulti( { name: "x", type: "x", age: 0 } )
 			should.exist( errors )
 			errors.should.have.length( 3 )
-			_.pluck( errors, "field" ).should.containDeep(["name", "type", "age"])
-			_.pluck( errors, "name" ).should.containDeep(["EVALIDATION_USER_LENGTH_NAME", "EVALIDATION_USER_LENGTH_TYPE", "EVALIDATION_USER_CHECK_AGE"])
+			_map( errors, "field" ).should.containDeep(["name", "type", "age"])
+			_map( errors, "name" ).should.containDeep(["EVALIDATION_USER_LENGTH_NAME", "EVALIDATION_USER_LENGTH_TYPE", "EVALIDATION_USER_CHECK_AGE"])
 			done()
 			return
 
-		it "faling between too low", ( done )->
+		it "failing between too low", ( done )->
 			err = userValidator.validate( { name: "John", type: "ab", money: 666 } )
 			should.exist( err )
 			err.name.should.eql( "EVALIDATION_USER_CHECK_MONEY" )
@@ -312,7 +322,7 @@ describe "OBJ-SCHEMA -", ->
 			done()
 			return
 
-		it "faling between too high", ( done )->
+		it "failing between too high", ( done )->
 			err = userValidator.validate( { name: "John", type: "ab", money: 6666 } )
 			should.exist( err )
 			err.name.should.eql( "EVALIDATION_USER_CHECK_MONEY" )
