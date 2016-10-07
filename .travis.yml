@@ -21,8 +21,6 @@ install: npm install
 before_script:
   - "npm install -g grunt-cli"
   - "grunt build"
-script:
-  - ./node_modules/.bin/mocha --compilers coffee:coffee-script/register --require coffee-coverage/register-istanbul _src/test/**.coffee --recursive -R spec
 after_success:
   - ./node_modules/.bin/istanbul report text-summary lcov
   - cat ./coverage/lcov.info | ./node_modules/.bin/coveralls

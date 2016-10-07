@@ -24,7 +24,7 @@
     "url": "https://github.com/mpneuried/obj-schema.git"
   },
   "scripts": {
-    "test": "grunt test"
+    "test": "COFFEECOV_INIT_ALL=false mocha --compilers coffee:coffee-script/register --require coffee-coverage/register-istanbul _src/test/**.coffee -R spec"
   },
   "engines": {
     "node": ">= 0.10.0"

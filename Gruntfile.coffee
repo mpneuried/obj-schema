@@ -21,7 +21,7 @@ module.exports = (grunt) ->
 
 		clean:
 			base:
-				src: [ "lib" ]
+				src: [ "lib", "coverage", "test" ]
 
 		includereplace:
 			pckg:
@@ -66,6 +66,7 @@ module.exports = (grunt) ->
 	grunt.registerTask "b", "build"
 	grunt.registerTask "w", "watch"
 	grunt.registerTask "t", "test"
+	grunt.registerTask "c", "clear"
 
 	# build the project
 	grunt.registerTask "build", [ "clear", "coffee:base", "includereplace" ]
