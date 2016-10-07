@@ -1,7 +1,10 @@
 should = require('should')
 _map = require('lodash/map')
 
-Schema = require( "../." )
+if process.env.COV
+	Schema = require( "../lib-cov/main" )
+else
+	Schema = require( "../." )
 
 userValidator = null
 settingsValidator = null

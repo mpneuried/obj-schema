@@ -37,12 +37,17 @@
     "js-striphtml": "1.1.x"
   },
   "devDependencies": {
+    "coveralls": "2.11.x",
     "grunt": "1.0.x",
     "grunt-contrib-clean": "1.0.x",
     "grunt-contrib-coffee": "1.0.x",
+    "grunt-contrib-watch": "1.0.x",
     "grunt-include-replace": "5.0.x",
     "grunt-mocha-cli": "2.1.x",
-    "grunt-contrib-watch": "1.0.x",
+    "istanbul": "0.4.x",
+    "jscoverage": "^0.6.0",
+    "mocha": "3.1.x",
+    "mocha-lcov-reporter": "^1.2.0",
     "should": "11.x"
   }
 }

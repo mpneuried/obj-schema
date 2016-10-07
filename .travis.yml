@@ -21,3 +21,6 @@ install: npm install
 before_script:
   - "npm install -g grunt-cli"
   - "grunt build"
+after_success:
+  -  ./node_modules/.bin/jscoverage lib lib-cov
+  - COV=1 ./node_modules/.bin/mocha test/**.js -R mocha-lcov-reporter | ./node_modules/coveralls/bin/coveralls.js
