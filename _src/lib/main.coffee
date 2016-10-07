@@ -64,9 +64,15 @@ module.exports = class ObjSchema
 	
 	validateMulti: ( data, options )=>
 		errors = []
-		for _k, def of @schema
-			[ err, _val ] = @_validateKey( _k, data[ _k ], def, data, options )
-			errors.push( err ) if err
+		if _isArray( @schema )
+			for def, idx in @schema
+				def.idx = idx
+				[ err, _val ] = @_validateKey( idx, data[ idx ], def, data, options )
+				errors.push( err ) if err
+		else
+			for _k, def of @schema
+				[ err, _val ] = @_validateKey( _k, data[ _k ], def, data, options )
+				errors.push( err ) if err
 			
 		if errors.length
 			return errors
@@ -74,14 +80,22 @@ module.exports = class ObjSchema
 			return null
 	
 	validate: ( data, options )=>
-		for _k, def of @schema
-			[ err, _val ] = @_validateKey( _k, data[ _k ], def, data, options )
-			return err if err?
+		if _isArray( @schema )
+			for def, idx in @schema
+				def.idx = idx
+				[ err, _val ] = @_validateKey( idx, data[ idx ], def, data, options )
+				return err if err?
+		else
+			for _k, def of @schema
+				[ err, _val ] = @_validateKey( _k, data[ _k ], def, data, options )
+				return err if err?
 		return null
 	
 	validateKey: ( key, val, options )=>
 		if not @schema[ key ]
 			return null
+		if _isArray( @schema )
+			def.idx = key
 		[ err, _val ] = @_validateKey( key, val, @schema[ key ], null, options )
 		if err?
 			return err
@@ -94,8 +108,10 @@ module.exports = class ObjSchema
 		if _isFunction( def.fnSkip ) and def.fnSkip( key, val, data, options )
 			return [ null, val ]
 		
+		_key = if _isNumber( key ) then def.key else key
+		
 		if def.required and not val?
-			return [ @_error( "required", key, def ), val ]
+			return [ @_error( "required", _key, def ), val ]
 		else if not val?
 			if def.default?
 				if _isFunction( def.default )
@@ -104,35 +120,35 @@ module.exports = class ObjSchema
 					val = def.default
 				data[ key ] = val if data?
 
+		
 		switch def.type
-
 			when "number"
 				if val? and ( not _isNumber( val ) )
-					return [ @_error( "number", key, def ), val ]
+					return [ @_error( "number", _key, def ), val ]
 
 			when "array"
 				if val? and ( not _isArray( val ) )
-					return [ @_error( "array", key, def ), val ]
+					return [ @_error( "array", _key, def ), val ]
 
 			when "boolean"
 				if val? and ( not _isBoolean( val ) )
-					return [ @_error( "boolean", key, def ), val ]
+					return [ @_error( "boolean", _key, def ), val ]
 
 			when "object"
 				if val? and ( not _isObject( val ) )
-					return [ @_error( "object", key, def ), val ]
+					return [ @_error( "object", _key, def ), val ]
 
 			when "string", "enum"
 				if val? and ( not _isString( val ) )
-					return [ @_error( "string", key, def ), val ]
+					return [ @_error( "string", _key, def ), val ]
 
 			when "email"
 				if val? and ( not _isString( val ) or not val.match( @_validateEmailRegex ) )
-					return [ @_error( "email", key, def ), val ]
+					return [ @_error( "email", _key, def ), val ]
 
 			when "timezone"
 				if val? and ( not _isString( val ) or not moment.tz.zone( val ) )
-					return [ @_error( "timezone", key, def ), val ]
+					return [ @_error( "timezone", _key, def ), val ]
 
 			when "schema"
 				if val? and _isObject( val ) and def.schema instanceof ObjSchema
@@ -140,7 +156,7 @@ module.exports = class ObjSchema
 					return [ _err if _err?, val ]
 
 		if val? and def.type is "string" and _isRegExp( def.regexp ) and not val.match( def.regexp )
-			return [ @_error( "regexp", key, def, { regexp: def.regexp.toString() } ), val ]
+			return [ @_error( "regexp", _key, def, { regexp: def.regexp.toString() } ), val ]
 
 		if val? and def.type is "string" and def.sanitize
 			val = sanitizer.sanitize( val )
@@ -157,8 +173,8 @@ module.exports = class ObjSchema
 			val = @trim( val )
 			data[ key ] = val if data?
 
-		if val? and def.type in [ "number", "string"]  and def.check?.operand? and def.check?.value?
-			if def.type is "string"
+		if val? and def.type in [ "number", "string", "array"]  and def.check?.operand? and def.check?.value?
+			if def.type in ["string", "array"]
 				_ename = "length"
 				_val = val.length
 			else
@@ -168,28 +184,28 @@ module.exports = class ObjSchema
 			switch def.check.operand.toLowerCase()
 				when "eq", "=", "=="
 					if _val isnt def.check.value
-						return [ @_error( _ename, key, def, { check: { operand: "eq", value: def.check.value }, "info": "not equal `#{def.check.value}`" } ), val ]
+						return [ @_error( _ename, _key, def, { check: { operand: "eq", value: def.check.value }, "info": "not equal `#{def.check.value}`" } ), val ]
 				when "neq", "!="
 					if _val is def.check.value
-						return [ @_error( _ename, key, def, { check: { operand: "neq", value: def.check.value }, "info": "equal `#{def.check.value}`" } ), val ]
+						return [ @_error( _ename, _key, def, { check: { operand: "neq", value: def.check.value }, "info": "equal `#{def.check.value}`" } ), val ]
 				when "gt", ">"
 					if _val <= def.check.value
-						return [ @_error( _ename, key, def, { check: { operand: "gt", value: def.check.value }, "info": "to low" } ), val ]
+						return [ @_error( _ename, _key, def, { check: { operand: "gt", value: def.check.value }, "info": "to low" } ), val ]
 				when "gte", ">="
 					if _val < def.check.value
-						return [ @_error( _ename, key, def, { check: { operand: "gte", value: def.check.value }, "info": "to low" } ), val ]
+						return [ @_error( _ename, _key, def, { check: { operand: "gte", value: def.check.value }, "info": "to low" } ), val ]
 				when "lt", "<"
 					if _val >= def.check.value
-						return [ @_error( _ename, key, def, { check: { operand: "lt", value: def.check.value }, "info": "to high" } ), val ]
+						return [ @_error( _ename, _key, def, { check: { operand: "lt", value: def.check.value }, "info": "to high" } ), val ]
 				when "lte", "<="
 					if _val > def.check.value
-						return [ @_error( _ename, key, def, { check: { operand: "lte", value: def.check.value }, "info": "to high" } ), val ]
+						return [ @_error( _ename, _key, def, { check: { operand: "lte", value: def.check.value }, "info": "to high" } ), val ]
 				when "between", "btw", "><"
 					if _isArray( def.check?.value ) and def.check.value.length is 2 and ( _val < def.check.value[0] or _val > def.check.value[1] )
-						return [ @_error( _ename, key, def, { check: { operand: "between", value: def.check.value }, "info": "not between `#{def.check.value[0]}` and `#{def.check.value[0]}`" } ), val ]
+						return [ @_error( _ename, _key, def, { check: { operand: "between", value: def.check.value }, "info": "not between `#{def.check.value[0]}` and `#{def.check.value[0]}`" } ), val ]
 		
 		if val? and def.type is "enum" and def.values? and val not in def.values
-			return [ @_error( "enum", key, def, { values: def.values.join(", ") } ), val ]
+			return [ @_error( "enum", _key, def, { values: def.values.join(", ") } ), val ]
 
 		if def.foreignReq? and _isArray( def.foreignReq )
 			for _fkey in def.foreignReq when not data[ _fkey ]?

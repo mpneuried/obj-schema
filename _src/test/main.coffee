@@ -66,7 +66,13 @@ describe "OBJ-SCHEMA -", ->
 			"tag":
 				type: "enum"
 				values: [ "A", "B", "C" ]
-
+			
+			"list":
+				type: "array"
+				check:
+					operand: "btw"
+					value: [2,4]
+			
 			"timezone":
 				type: "timezone"
 
@@ -119,6 +125,7 @@ describe "OBJ-SCHEMA -", ->
 				email: "john@do.com"
 				sex: "M"
 				tag: "A"
+				list: [1,2,3]
 				age: 23
 				timezone: "CET"
 				settings: { a: "foo" }
@@ -341,7 +348,41 @@ describe "OBJ-SCHEMA -", ->
 			should.not.exist( err )
 			done()
 			return
-
+		
+		it "array: wrong type", ( done )->
+			err = userValidator.validate( { name: "John", list: 123 } )
+			should.exist( err )
+			err.name.should.eql( "EVALIDATION_USER_ARRAY_LIST" )
+			err.type.should.eql( "array" )
+			done()
+			return
+		
+		it "array: between length too low", ( done )->
+			err = userValidator.validate( { name: "John", list: [1], money: 5000 } )
+			err.name.should.eql( "EVALIDATION_USER_LENGTH_LIST" )
+			err.type.should.eql( "length" )
+			done()
+			return
+		
+		it "array: between length top boundary", ( done )->
+			err = userValidator.validate( { name: "John", list: [1,2], money: 5000 } )
+			should.not.exist( err )
+			done()
+			return
+	
+		it "array: between length top boundary", ( done )->
+			err = userValidator.validate( { name: "John", list: [1,2,3,4], money: 5000 } )
+			should.not.exist( err )
+			done()
+			return
+		
+		it "array: between length too high", ( done )->
+			err = userValidator.validate( { name: "John", list: [1,2,3,4,5], money: 5000 } )
+			err.name.should.eql( "EVALIDATION_USER_LENGTH_LIST" )
+			err.type.should.eql( "length" )
+			done()
+			return
+		
 		return
 		
 	describe 'Single Key -', ->
@@ -383,6 +424,60 @@ describe "OBJ-SCHEMA -", ->
 			res.should.eql( "abcXYZ" )
 			done()
 			return
+		return
+		
+	describe 'Check Array content -', ->
+		
+		userValidatorArray = new Schema([
+				key: "id",
+				required: true,
+				type: "number"
+			,
+				key: "name",
+				type: "string"
+				check:
+					operand: "btw"
+					value: [4,20]
+			,
+				key: "email",
+				type: "email"
+			,
+				key: "age"
+			,
+				key: "foo"
+				type: "number"
+				default: 42
+		], { name: "user" })
+		
+		it "successfull validate", ( done )->
+			_data = [ 123, "John", "john@do.com", 23 ]
+			err = userValidatorArray.validate( _data, { type: "create" } )
+			should.not.exist( err )
+			should.exist( _data[3] )
+			_data[3].should.eql( 23 )
+			_data[4].should.eql( 42 )
+			should.not.exist( _data[5] )
+			done()
+			return
+		
+		it "missing id", ( done )->
+			_data = [ null, "John", "john@do.com", 23 ]
+			err = userValidatorArray.validate( _data, { type: "create" } )
+			should.exist( err )
+			err.name.should.eql( "EVALIDATION_USER_REQUIRED_ID" )
+			err.def.idx.should.eql( 0 )
+			done()
+			return
+			
+		it "invalid name", ( done )->
+			_data = [ 45, "Doe", "john@do.com", 23 ]
+			err = userValidatorArray.validate( _data, { type: "create" } )
+			should.exist( err )
+			err.name.should.eql( "EVALIDATION_USER_LENGTH_NAME" )
+			err.def.idx.should.eql( 1 )
+			done()
+			return
+		
 		return
 	
 	describe 'Custom functions -', ->

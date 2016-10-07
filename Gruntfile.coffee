@@ -50,10 +50,6 @@ module.exports = (grunt) ->
 					env:
 						severity_heartbeat: "debug"
 		
-		exec:
-			start_atom:
-				command: "atom ."
-		
 
 	# Load npm modules
 	grunt.loadNpmTasks "grunt-contrib-watch"
@@ -61,14 +57,17 @@ module.exports = (grunt) ->
 	grunt.loadNpmTasks "grunt-contrib-clean"
 	grunt.loadNpmTasks "grunt-mocha-cli"
 	grunt.loadNpmTasks "grunt-include-replace"
-	grunt.loadNpmTasks "grunt-exec"
 	
 	# ALIAS TASKS
 	grunt.registerTask "watcher", ["build", "test", "watch:dev"]
 	grunt.registerTask "default", "build"
 	grunt.registerTask "clear", [ "clean:base" ]
 	grunt.registerTask "test", [ "mochacli:main" ]
-	grunt.registerTask "dev", [ "exec:start_atom", "build", "test", "watch:dev" ]
+	
+	# Shortcuts 
+	grunt.registerTask "b", "build"
+	grunt.registerTask "w", "watch"
+	grunt.registerTask "t", "test"
 
 	# build the project
 	grunt.registerTask "build", [ "clear", "coffee:base", "includereplace" ]

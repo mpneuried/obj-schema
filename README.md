@@ -42,13 +42,37 @@ Simple module to validate an object by a predefined schema
 	console.log( uservalidator.validate( { name: "John", email: "john@do.com", age: "23" } ) ); // Error[`EVALIDATION_USER_NUMBER_AGE`: The value in `age` has to be a number]
 ```
 
+**Array Version**
+
+```js
+	var Schema = require( "obj-schema" );
+
+	uservalidator = new Schema( [{
+			key: "name",
+			type: "string",
+			required: true
+		},{
+			key: "email",
+			type: "email"
+		},{
+			key: "age",
+			type: "number",
+			default: 42
+		}]
+	}, { name: "user" });
+
+	console.log( uservalidator.validate( [ "John", "john@do.com", 23 ] ) ); // null
+	console.log( uservalidator.validate( [ "John", "john@do.com", "23" ] ) ); // Error[`EVALIDATION_USER_NUMBER_AGE`: The value in `age` has to be a number]
+```
+
+
 The schema will check the given object against the defined rules and returns `null` on success or an error if the object is not valid.
 If the schema is configured to change the values it'll do this directly on the object reference.
 
 
 **Config** 
 
-- **schema**: *( `Object` required )* : The schema for validation
+- **schema**: *( `Object|Array` required )* : The schema for validation
 	- **schema[ {key} ]** : *( `Object` )* Every key will be validated by the given config. See section **Schema-Types**
 - **options** *( `Object` optional )* The configuration object
 	- **options.name** : *( `String` optional: default = `data` )* A name used to inject it to the error name.
@@ -343,6 +367,7 @@ var uservalidator = new Schema( {
 
 |Version|Date|Description|
 |:--:|:--:|:--|
+|1.2.0|2016-10-07|added length checks to array type; Made it possible to use an Array as schema to check the elements of an array; Optimized dev env.|
 |1.1.3|2016-03-08|updated dependencies. Especially lodash to version 4|
 |1.1.2|2015-07-31|removed dependency `mpbasic` for a smaller footprint within browserify|
 |1.1.1|2015-07-14|reduced error check operand to the values `eq,neq,gt,gte,lt,lte,between`|
