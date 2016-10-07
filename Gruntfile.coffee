@@ -50,23 +50,6 @@ module.exports = (grunt) ->
 					env:
 						severity_heartbeat: "debug"
 		
-		
-		docker:
-			serverdocs:
-				expand: true
-				src: ["_src/**/*.coffee", "README.md"]
-				dest: "_docs/"
-				options:
-					onlyUpdated: false
-					colourScheme: "autumn"
-					ignoreHidden: false
-					sidebarState: true
-					exclude: false
-					lineNums: true
-					js: []
-					css: []
-					extras: []
-					
 		exec:
 			start_atom:
 				command: "atom ."
@@ -78,17 +61,15 @@ module.exports = (grunt) ->
 	grunt.loadNpmTasks "grunt-contrib-clean"
 	grunt.loadNpmTasks "grunt-mocha-cli"
 	grunt.loadNpmTasks "grunt-include-replace"
-	grunt.loadNpmTasks "grunt-docker"
 	grunt.loadNpmTasks "grunt-exec"
 	
 	# ALIAS TASKS
 	grunt.registerTask "watcher", ["build", "test", "watch:dev"]
 	grunt.registerTask "default", "build"
-	grunt.registerTask "docs", "docker"
 	grunt.registerTask "clear", [ "clean:base" ]
 	grunt.registerTask "test", [ "mochacli:main" ]
 	grunt.registerTask "dev", [ "exec:start_atom", "build", "test", "watch:dev" ]
 
 	# build the project
 	grunt.registerTask "build", [ "clear", "coffee:base", "includereplace" ]
-	grunt.registerTask "release", [ "clear", "coffee:base", "docs", "test" ]
+	grunt.registerTask "release", [ "clear", "coffee:base", "test" ]
