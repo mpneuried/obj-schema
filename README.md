@@ -2,8 +2,8 @@ obj-schema
 ============
 
 [![Build Status](https://secure.travis-ci.org/mpneuried/obj-schema.png?branch=master)](http://travis-ci.org/mpneuried/obj-schema)
-[![Windows Tests](https://img.shields.io/appveyor/ci/mpneuried/ex-redis-sessions.svg?label=WindowsTest)](https://ci.appveyor.com/project/mpneuried/ex-redis-sessions)
-[![Coveralls Coverage](https://img.shields.io/coveralls/mpneuried/ex-redis-sessions.svg)](https://coveralls.io/github/mpneuried/ex-redis-sessions)
+[![Windows Tests](https://img.shields.io/appveyor/ci/mpneuried/obj-schema.svg?label=WindowsTest)](https://ci.appveyor.com/project/mpneuried/obj-schema)
+[![Coveralls Coverage](https://img.shields.io/coveralls/mpneuried/obj-schema.svg)](https://coveralls.io/github/mpneuried/obj-schema)
 
 [![Deps Status](https://david-dm.org/mpneuried/obj-schema.png)](https://david-dm.org/mpneuried/obj-schema)
 [![npm version](https://badge.fury.io/js/obj-schema.png)](http://badge.fury.io/js/obj-schema)
@@ -371,7 +371,7 @@ var uservalidator = new Schema( {
 
 |Version|Date|Description|
 |:--:|:--:|:--|
-|1.2.1|2016-10-07|Added badges and coveralls report|
+|1.2.2|2016-10-07|Added badges and coveralls report|
 |1.2.0|2016-10-07|added length checks to array type; Made it possible to use an Array as schema to check the elements of an array; Optimized dev env.|
 |1.1.3|2016-03-08|updated dependencies. Especially lodash to version 4|
 |1.1.2|2015-07-31|removed dependency `mpbasic` for a smaller footprint within browserify|
