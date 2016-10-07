@@ -38,7 +38,7 @@
   },
   "devDependencies": {
     "coffee-coverage": "1.x",
-    "coffee-script": "2.x",
+    "coffee-script": "1.11.x",
     "coveralls": "2.11.x",
     "grunt": "1.0.x",
     "grunt-contrib-clean": "1.0.x",
