@@ -11,3 +11,5 @@ coffeelint.json
 .travis.yml
 example.js
 *-cov/
+*.yml
+test/*
