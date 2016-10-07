@@ -11,5 +11,6 @@ coffeelint.json
 .travis.yml
 example.js
 *-cov/
+*coverage/
 *.yml
 test/*

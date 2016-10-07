@@ -371,6 +371,7 @@ var uservalidator = new Schema( {
 
 |Version|Date|Description|
 |:--:|:--:|:--|
+|1.2.3|2016-10-07|Optimized sub-schema data type validation to check for object/array; use coveralls directly with coffee|
 |1.2.2|2016-10-07|Added badges and coveralls report|
 |1.2.0|2016-10-07|added length checks to array type; Made it possible to use an Array as schema to check the elements of an array; Optimized dev env.|
 |1.1.3|2016-03-08|updated dependencies. Especially lodash to version 4|

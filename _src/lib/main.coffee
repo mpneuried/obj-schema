@@ -37,6 +37,7 @@ module.exports = class ObjSchema
 
 	constructor: ( @schema, options )->
 		
+		@isArray = _isArray( @schema )
 		@config = @defaults()
 		@config.name = options.name if options.name?
 		
@@ -64,7 +65,7 @@ module.exports = class ObjSchema
 	
 	validateMulti: ( data, options )=>
 		errors = []
-		if _isArray( @schema )
+		if @isArray
 			for def, idx in @schema
 				def.idx = idx
 				[ err, _val ] = @_validateKey( idx, data[ idx ], def, data, options )
@@ -80,7 +81,7 @@ module.exports = class ObjSchema
 			return null
 	
 	validate: ( data, options )=>
-		if _isArray( @schema )
+		if @isArray
 			for def, idx in @schema
 				def.idx = idx
 				[ err, _val ] = @_validateKey( idx, data[ idx ], def, data, options )
@@ -94,7 +95,7 @@ module.exports = class ObjSchema
 	validateKey: ( key, val, options )=>
 		if not @schema[ key ]
 			return null
-		if _isArray( @schema )
+		if @isArray
 			def.idx = key
 		[ err, _val ] = @_validateKey( key, val, @schema[ key ], null, options )
 		if err?
@@ -108,7 +109,10 @@ module.exports = class ObjSchema
 		if _isFunction( def.fnSkip ) and def.fnSkip( key, val, data, options )
 			return [ null, val ]
 		
-		_key = if _isNumber( key ) then def.key else key
+		if _isNumber( key )
+			_key = def.key
+		else
+			_key = key
 		
 		if def.required and not val?
 			return [ @_error( "required", _key, def ), val ]
@@ -151,6 +155,10 @@ module.exports = class ObjSchema
 					return [ @_error( "timezone", _key, def ), val ]
 
 			when "schema"
+				if val? and def.schema.isArray and not _isArray( val )
+					return [ @_error( "schema", _key, def, { st: "array" } ), val ]
+				if val? and not def.schema.isArray and not ( _isObject( val ) and not _isArray( val ) )
+					return [ @_error( "schema", _key, def, { st: "object" } ), val ]
 				if val? and _isObject( val ) and def.schema instanceof ObjSchema
 					_err = def.schema.validate( val )
 					return [ _err if _err?, val ]
@@ -233,12 +241,13 @@ module.exports = class ObjSchema
 	_ERRORMSGS:
 		required: "Please define the value `<%= key %>`"
 		number: "The value in `<%= key %>` has to be a number"
+		schema: "The value in `<%= key %>` has to be a <%= opt.st %> to match against the sub schema"
 		string: "The value in `<%= key %>` has to be a string"
 		array: "The value in `<%= key %>` has to be an array"
 		boolean: "The value in `<%= key %>` has to be a boolean"
 		object: "The value in `<%= key %>` has to be a object"
 		check: "The value in `<%= key %>` is <%= opt.info %>"
-		length: "The string length in `<%= key %>` is <%= opt.info %>"
+		length: "The <%= def.type %> length in `<%= key %>` is <%= opt.info %>"
 		email: "The value in `<%= key %>` has to be a valid email"
 		timezone: "The value in `<%= key %>` has to be a valid timezone. Please check the moment-timezone (http://momentjs.com/timezone)"
 		enum: "The value in `<%= key %>` has to be one of `<%= opt.values %>`"

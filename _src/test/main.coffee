@@ -21,6 +21,16 @@ describe "OBJ-SCHEMA -", ->
 				type: "number"
 		
 		, { name: "settings" } )
+		
+		
+		settingsValidatorArr = new Schema([
+			key: "a",
+			type: "string"
+			required: true
+		,
+			key: "b",
+			type: "number"
+		], { name: "settings-list" } )
 
 		userValidator = new Schema(
 			"name":
@@ -82,6 +92,10 @@ describe "OBJ-SCHEMA -", ->
 			"settings":
 				type: "schema"
 				schema: settingsValidator
+				
+			"settings_list":
+				type: "schema"
+				schema: settingsValidatorArr
 
 			"props":
 				type: "object"
@@ -385,6 +399,73 @@ describe "OBJ-SCHEMA -", ->
 			err.type.should.eql( "length" )
 			done()
 			return
+		
+		it "schema: test sub schemas", ( done )->
+			err = userValidator.validate( { name: "John", settings: { a: "abc", b: 23 }, settings_list: ["abc",23 ] } )
+			should.not.exist( err )
+			done()
+			return
+		
+		it "schema: use a wrong type for sub-schema", ( done )->
+			err = userValidator.validate( { name: "John", settings: "abc" } )
+			err.name.should.eql( "EVALIDATION_USER_SCHEMA_SETTINGS" )
+			err.type.should.eql( "schema" )
+			err.message.should.containEql( "object" )
+			done()
+			return
+		
+		it "schema: use a wrong type for sub-schema", ( done )->
+			err = userValidator.validate( { name: "John", settings: ["foo", 42] } )
+			err.name.should.eql( "EVALIDATION_USER_SCHEMA_SETTINGS" )
+			err.type.should.eql( "schema" )
+			err.message.should.containEql( "object" )
+			done()
+			return
+		
+		it "schema: use a wrong content both", ( done )->
+			err = userValidator.validate( { name: "John", settings: { a: 23, b: "foo" } } )
+			err.name.should.eql( "EVALIDATION_SETTINGS_STRING_A" )
+			err.type.should.eql( "string" )
+			done()
+			return
+		
+		it "schema: use a wrong content only b", ( done )->
+			err = userValidator.validate( { name: "John", settings: { a: "foo", b: "bar" } } )
+			err.name.should.eql( "EVALIDATION_SETTINGS_NUMBER_B" )
+			err.type.should.eql( "number" )
+			done()
+			return
+			
+		it "schema-array: use a wrong type for sub-schema", ( done )->
+			err = userValidator.validate( { name: "John", settings_list: "abc" } )
+			err.name.should.eql( "EVALIDATION_USER_SCHEMA_SETTINGS_LIST" )
+			err.type.should.eql( "schema" )
+			err.message.should.containEql( "array" )
+			done()
+			return
+		
+		it "schema-array: use a wrong type for sub-schema", ( done )->
+			err = userValidator.validate( { name: "John", settings_list: { a: "foo", b : 42 } } )
+			err.name.should.eql( "EVALIDATION_USER_SCHEMA_SETTINGS_LIST" )
+			err.type.should.eql( "schema" )
+			err.message.should.containEql( "array" )
+			done()
+			return
+		
+		it "schema-array: use a wrong content for 1st", ( done )->
+			err = userValidator.validate( { name: "John", settings_list: [13, 42] } )
+			err.name.should.eql( "EVALIDATION_SETTINGS-LIST_STRING_A" )
+			err.type.should.eql( "string" )
+			done()
+			return
+		
+		it "schema-array: use a wrong content for 2nd", ( done )->
+			err = userValidator.validate( { name: "John", settings_list: ["foo", "bar"] } )
+			err.name.should.eql( "EVALIDATION_SETTINGS-LIST_NUMBER_B" )
+			err.type.should.eql( "number" )
+			done()
+			return
+		
 		
 		return
 		

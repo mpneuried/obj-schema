@@ -1,6 +1,6 @@
 {
   "name": "obj-schema",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "Simple module to validate an object by a predefined schema",
   "keywords": [
     "object",
@@ -37,6 +37,8 @@
     "js-striphtml": "1.1.x"
   },
   "devDependencies": {
+    "coffee-coverage": "1.x",
+    "coffee-script": "^1.11.1",
     "coveralls": "2.11.x",
     "grunt": "1.0.x",
     "grunt-contrib-clean": "1.0.x",

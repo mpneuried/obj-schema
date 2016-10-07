@@ -15,13 +15,13 @@ module.exports = (grunt) ->
 			base:
 				expand: true
 				cwd: '_src',
-				src: ["**/*.coffee"]
+				src: ["lib/*.coffee"]
 				dest: ''
 				ext: '.js'
 
 		clean:
 			base:
-				src: [ "lib", "test" ]
+				src: [ "lib" ]
 
 		includereplace:
 			pckg:
@@ -38,17 +38,15 @@ module.exports = (grunt) ->
 		
 		mochacli:
 			options:
-				require: [ "should" ]
+				require: [ "should", "coffee-coverage/register-istanbul" ]
 				reporter: "spec"
 				bail: false
 				timeout: 3000
 				slow: 3
+				compilers: "coffee:coffee-script/register"
 
 			main:
-				src: [ "test/main.js" ]
-				options:
-					env:
-						severity_heartbeat: "debug"
+				src: [ "_src/test/main.coffee" ]
 		
 
 	# Load npm modules
