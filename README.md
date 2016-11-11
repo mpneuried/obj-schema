@@ -80,6 +80,8 @@ If the schema is configured to change the values it'll do this directly on the o
 	- **schema[ {key} ]** : *( `Object` )* Every key will be validated by the given config. See section **Schema-Types**
 - **options** *( `Object` optional )* The configuration object
 	- **options.name** : *( `String` optional: default = `data` )* A name used to inject it to the error name.
+	- **options.customerror** : *( `Function` optional: default = `error` )* A custom error function to generate your own error objects.
+	> This method will be bind to the Schema istance, so you can use all methods of obj-schema.
 
 ## Schema-Types
 
@@ -262,6 +264,32 @@ A helper method to use it with a callback.
 	}
 ```
 
+### `.error( errtype, key, def, opt )`
+
+The internaly used method to generate the reponse error obj. 
+You can define your own error obj. creator by defining a custom function in `options.customerror`.
+
+**Arguments**
+
+* `errtype` : *( `String` required )*: The error type. This could be one of the Schema-Types
+* `key` : *( `String` required )*: The key that doues not match
+* `def` : *( `Object` required )*: The schema definition of the key
+* `opt` : *( `Object` required )*: additional informations to generate the data
+
+**Return**
+
+*( Null|Error )*: Returns `null` on success and an error if the validation failed. 
+
+**Example**
+
+```js
+	function create( data, cb ){
+		uservalidator.validateCb( data, function( err, data ){
+			// do your stuff
+		});
+	}
+```
+
 ## Error
 
 This module uses a custom Error ( `ObjSchemaError` ) to add some meta data to the validation error response.
@@ -371,6 +399,7 @@ var uservalidator = new Schema( {
 
 |Version|Date|Description|
 |:--:|:--:|:--|
+|1.3.0|2016-11-11|added option `customerror` to be able to create your own error objects|
 |1.2.3|2016-10-07|Optimized sub-schema data type validation to check for object/array; use coveralls directly with coffee|
 |1.2.2|2016-10-07|Added badges and coveralls report|
 |1.2.0|2016-10-07|added length checks to array type; Made it possible to use an Array as schema to check the elements of an array; Optimized dev env.|

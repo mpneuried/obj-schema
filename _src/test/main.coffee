@@ -571,7 +571,23 @@ describe "OBJ-SCHEMA -", ->
 		
 		fnDefaultName = ( key, val, data, options )->
 			return "autogen-" + data.id
+		
+		class ObjSchemaTestError extends Error
+			statusCode: 406
+			customError: true
+			testError: true
 			
+			constructor: ( @nane = @constructor.name, @message = "-" )->
+				@stack = (new Error).stack
+				return
+		
+		fnCustomError = ( errtype, key, def, opt, cnf )->
+			if key in [ "id", "name" ]
+				_err = new ObjSchemaTestError()
+				_err.name = "Error.Custom.#{key}.#{errtype}"
+				return _err
+			return Schema::error.apply( @, arguments )
+		
 		userValidatorFn = new Schema({
 			id:
 				required: true,
@@ -584,7 +600,7 @@ describe "OBJ-SCHEMA -", ->
 				type: "email"
 			age:
 				default: fnDefaultAge
-		}, { name: "user" })
+		}, { name: "user_custom", customerror: fnCustomError })
 		
 		
 		it "successfull validate with fnSkip", ( done )->
@@ -600,7 +616,26 @@ describe "OBJ-SCHEMA -", ->
 			_data = { name: "John", email: "john@do.com" }
 			err = userValidatorFn.validate( _data, { type: "create" } )
 			should.exist( err )
-			err.name.should.eql( "EVALIDATION_USER_REQUIRED_ID" )
+			err.name.should.eql( "Error.Custom.id.required" )
+			should.exist( err.testError )
+			done()
+			return
+		
+		it "failing because wrong name type", ( done )->
+			_data = { id: 123, name: 123, email: "john@do.com" }
+			err = userValidatorFn.validate( _data, { type: "create" } )
+			should.exist( err )
+			err.name.should.eql( "Error.Custom.name.string" )
+			should.exist( err.testError )
+			done()
+			return
+		
+		it "failing because wrong email type", ( done )->
+			_data = { id: 123, name: "John", email: [ "john@do.com", "jim@do.com" ] }
+			err = userValidatorFn.validate( _data, { type: "create" } )
+			should.exist( err )
+			err.name.should.eql( "EVALIDATION_USER_CUSTOM_EMAIL_EMAIL" )
+			should.not.exist( err.testError )
 			done()
 			return
 		

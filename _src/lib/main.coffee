@@ -40,6 +40,7 @@ module.exports = class ObjSchema
 		@isArray = _isArray( @schema )
 		@config = @defaults()
 		@config.name = options.name if options.name?
+		@config.customerror = options.customerror if options.customerror? and _isFunction( options.customerror )
 		
 		@_initMsgs()
 		return
@@ -222,6 +223,11 @@ module.exports = class ObjSchema
 		return [ null, val ]
 		
 	_error: ( errtype, key, def, opt )=>
+		if @config.customerror?
+			return @config.customerror.call( @, errtype, key, def, opt, @config )
+		return @error( errtype, key, def, opt )
+		
+	error: (  errtype, key, def, opt )=>
 		_err = new ObjSchemaError()
 		_err.name = "EVALIDATION_" + @config.name.toUpperCase() + "_" + errtype.toUpperCase() + "_" + key.toUpperCase()
 		_err.message = @msgs[ errtype ]?( { key: key, def: def, opt: opt } ) or "-"
