@@ -1,5 +1,6 @@
 should = require('should')
 _map = require('lodash/map')
+_difference = require('lodash/difference')
 
 Schema = require( "../." )
 
@@ -13,9 +14,12 @@ describe "OBJ-SCHEMA -", ->
 			"a":
 				type: "string"
 				required: true
-
 			"b":
 				type: "number"
+			
+			"c":
+				foreignReq: ["b"]
+				type: "boolean"
 		
 		, { name: "settings" } )
 		
@@ -33,11 +37,20 @@ describe "OBJ-SCHEMA -", ->
 			"name":
 				type: "string"
 				required: true
+				trim: true
+				sanitize: true
+				striphtml: true
 				check:
 					operand: ">="
 					value: 4
 			
 			"nickname":
+				type: "string"
+				check:
+					operand: "<"
+					value: 10
+			
+			"nicknameb":
 				type: "string"
 				check:
 					operand: "<"
@@ -135,6 +148,7 @@ describe "OBJ-SCHEMA -", ->
 			_data =
 				name: "John"
 				nickname: "johndoe"
+				nicknameb: "johndoe"
 				type: "ab"
 				email: "john@do.com"
 				sex: "M"
@@ -142,7 +156,7 @@ describe "OBJ-SCHEMA -", ->
 				list: [1,2,3]
 				age: 23
 				timezone: "CET"
-				settings: { a: "foo" }
+				settings: { a: "foo", b: 123, c: true }
 				props: { foo: "bar" }
 				active: false
 				money: 1001
@@ -291,14 +305,33 @@ describe "OBJ-SCHEMA -", ->
 			done()
 			return
 		
-		it "failing string length too high", ( done )->
-			err = userValidator.validate( { name: "John", nickname: "johntheipsumdo", age: 0 } )
+		it "failing string length too high (lt)", ( done )->
+			err = userValidator.validate( { name: "John", nickname: "johntheipsumdo", age: 23 } )
 			should.exist( err )
 			err.name.should.eql( "EVALIDATION_USER_LENGTH_NICKNAME" )
 			err.should.have.property( "def" )
 				.and.have.property( "check" )
 				.and.have.property( "value" )
 				.and.eql( 10 )
+			done()
+			return
+			
+		it "failing string length too high (lte)", ( done )->
+			err = userValidator.validate( { name: "John", nicknameb: "johntheipsu", age: 23 } )
+			should.exist( err )
+			err.name.should.eql( "EVALIDATION_USER_LENGTH_NICKNAMEB" )
+			err.should.have.property( "def" )
+				.and.have.property( "check" )
+				.and.have.property( "value" )
+				.and.eql( 10 )
+			done()
+			return
+		
+		it "cheching trim and sanitize", ( done )->
+			data = { name: " John <script>alert(234)</script><b>Doe</b>    ", age: 23 }
+			err = userValidator.validate( data )
+			should.not.exist( err )
+			data.name.should.equal( "John Doe" )
 			done()
 			return
 		
@@ -484,9 +517,6 @@ describe "OBJ-SCHEMA -", ->
 			done()
 			return
 		
-		
-		return
-		
 	describe 'Single Key -', ->
 		it "successfull validate a single key", ( done )->
 			res = userValidator.validateKey( "name", "John" )
@@ -579,6 +609,21 @@ describe "OBJ-SCHEMA -", ->
 			err.def.idx.should.eql( 1 )
 			done()
 			return
+			
+		it "invalid name multi", ( done )->
+			_data = [ 45, "Doe", "johndo.com", 23 ]
+			err = userValidatorArray.validateMulti( _data, { type: "create" } )
+			should.exist( err )
+			for _e in err
+				switch _e.type
+					when "length"
+						_e.name.should.eql( "EVALIDATION_USER_LENGTH_NAME" )
+						_e.def.idx.should.eql( 1 )
+					when "email"
+						_e.name.should.eql( "EVALIDATION_USER_EMAIL_EMAIL" )
+						_e.def.idx.should.eql( 2 )
+			done()
+			return
 		
 		it "input invalid data formats as base: `null`", ( done )->
 			err = userValidatorArray.validate( null )
@@ -653,6 +698,8 @@ describe "OBJ-SCHEMA -", ->
 			_data.age.should.eql( 23 )
 			done()
 			return
+		
+		
 			
 		it "failing validate with fnSkip", ( done )->
 			_data = { name: "John", email: "john@do.com" }
@@ -711,4 +758,21 @@ describe "OBJ-SCHEMA -", ->
 				.and.eql( _expName )
 			done()
 			return
+		return
+		
+	describe 'Helper Methods -', ->
+		it "keys method", ( done )->
+			_keys = userValidator.keys()
+			_exp = "name,nickname,nicknameb,type,email,sex,tag,list,age,timezone,settings,props,active,money,checkA,checkB,flagA,flagB,comment,settings_list".split( "," )
+			_difference( _keys, _exp ).should.length( 0 )
+			_difference( _exp, _keys ).should.length( 0 )
+			done()
+			return
+		
+		it "trim method", ( done )->
+			userValidator.trim( "   a b  e t  " ).should.equal( "a b  e t" )
+			done()
+			return
+		
+		return
 	return
