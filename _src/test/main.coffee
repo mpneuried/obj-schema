@@ -463,6 +463,27 @@ describe "OBJ-SCHEMA -", ->
 			done()
 			return
 		
+		it "input invalid data formats as base: `null`", ( done )->
+			err = userValidator.validate( null )
+			err.name.should.eql( "EVALIDATION_USER_OBJECT" )
+			err.type.should.eql( "object" )
+			done()
+			return
+		
+		it "input invalid data formats as base: `boolean`", ( done )->
+			err = userValidator.validate( true )
+			err.name.should.eql( "EVALIDATION_USER_OBJECT" )
+			err.type.should.eql( "object" )
+			done()
+			return
+		
+		it "input invalid data formats as base: `array`", ( done )->
+			err = userValidator.validate( [ "John" ] )
+			err.name.should.eql( "EVALIDATION_USER_OBJECT" )
+			err.type.should.eql( "object" )
+			done()
+			return
+		
 		
 		return
 		
@@ -556,6 +577,27 @@ describe "OBJ-SCHEMA -", ->
 			should.exist( err )
 			err.name.should.eql( "EVALIDATION_USER_LENGTH_NAME" )
 			err.def.idx.should.eql( 1 )
+			done()
+			return
+		
+		it "input invalid data formats as base: `null`", ( done )->
+			err = userValidatorArray.validate( null )
+			err.name.should.eql( "EVALIDATION_USER_ARRAY" )
+			err.type.should.eql( "array" )
+			done()
+			return
+		
+		it "input invalid data formats as base: `boolean`", ( done )->
+			err = userValidatorArray.validate( true )
+			err.name.should.eql( "EVALIDATION_USER_ARRAY" )
+			err.type.should.eql( "array" )
+			done()
+			return
+		
+		it "input invalid data formats as base: `object`", ( done )->
+			err = userValidatorArray.validate( { name: "John" } )
+			err.name.should.eql( "EVALIDATION_USER_ARRAY" )
+			err.type.should.eql( "array" )
 			done()
 			return
 		

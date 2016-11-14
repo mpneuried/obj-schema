@@ -67,11 +67,17 @@ module.exports = class ObjSchema
 	validateMulti: ( data, options )=>
 		errors = []
 		if @isArray
+			if not _isArray( data )
+				return [ @_error( "array", null ) ]
+				
 			for def, idx in @schema
 				def.idx = idx
 				[ err, _val ] = @_validateKey( idx, data[ idx ], def, data, options )
 				errors.push( err ) if err
 		else
+			if not _isObject( data )
+				return [ @_error( "object", null ) ]
+				
 			for _k, def of @schema
 				[ err, _val ] = @_validateKey( _k, data[ _k ], def, data, options )
 				errors.push( err ) if err
@@ -83,11 +89,17 @@ module.exports = class ObjSchema
 	
 	validate: ( data, options )=>
 		if @isArray
+			if not _isArray( data )
+				return @_error( "array", null )
+				
 			for def, idx in @schema
 				def.idx = idx
 				[ err, _val ] = @_validateKey( idx, data[ idx ], def, data, options )
 				return err if err?
 		else
+			if not ( _isObject( data ) and not _isArray( data ) )
+				return @_error( "object", null )
+				
 			for _k, def of @schema
 				[ err, _val ] = @_validateKey( _k, data[ _k ], def, data, options )
 				return err if err?
@@ -229,7 +241,7 @@ module.exports = class ObjSchema
 		
 	error: (  errtype, key, def, opt )=>
 		_err = new ObjSchemaError()
-		_err.name = "EVALIDATION_" + @config.name.toUpperCase() + "_" + errtype.toUpperCase() + "_" + key.toUpperCase()
+		_err.name = "EVALIDATION_" + @config.name.toUpperCase() + "_" + errtype.toUpperCase() + ( if key? then  "_" + key.toUpperCase() else "" )
 		_err.message = @msgs[ errtype ]?( { key: key, def: def, opt: opt } ) or "-"
 		_err.type = errtype
 		_err.field = key

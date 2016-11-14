@@ -399,6 +399,7 @@ var uservalidator = new Schema( {
 
 |Version|Date|Description|
 |:--:|:--:|:--|
+|1.4.0|2016-11-14|validate the basic input object for a object/array|
 |1.3.0|2016-11-11|added option `customerror` to be able to create your own error objects|
 |1.2.3|2016-10-07|Optimized sub-schema data type validation to check for object/array; use coveralls directly with coffee|
 |1.2.2|2016-10-07|Added badges and coveralls report|
