@@ -1,6 +1,6 @@
 {
   "name": "obj-schema",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "Simple module to validate an object by a predefined schema",
   "keywords": [
     "object",
@@ -38,7 +38,7 @@
   },
   "devDependencies": {
     "coffee-coverage": "1.x",
-    "coffee-script": "1.11.x",
+    "coffee-script": "1.12.x",
     "coveralls": "2.11.x",
     "grunt": "1.0.x",
     "grunt-contrib-clean": "1.0.x",
@@ -47,7 +47,7 @@
     "grunt-include-replace": "5.0.x",
     "grunt-mocha-cli": "3.0.x",
     "istanbul": "0.4.x",
-    "mocha": "3.1.x",
+    "mocha": "3.2.x",
     "should": "11.x"
   }
 }

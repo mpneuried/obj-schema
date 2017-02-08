@@ -15,6 +15,7 @@ _isObject = require( "lodash/isObject" )
 _isString = require( "lodash/isString" )
 _isObject = require( "lodash/isObject" )
 _isRegExp = require( "lodash/isRegExp" )
+_assignIn = require( "lodash/assignIn" )
 _template = require( "lodash/template" )
 
 moment = require( "moment-timezone" )
@@ -35,16 +36,38 @@ module.exports = class ObjSchema
 	defaults: ->
 		name: "data"
 
-	constructor: ( @schema, options )->
+	constructor: ( schema, options={} )->
 		
-		@isArray = _isArray( @schema )
+		@isArray = _isArray( schema )
 		@config = @defaults()
-		@config.name = options.name if options.name?
+		if options.name?
+			@config.name = options.name
+		else
+			options.name = @config.name
+			
+		@schema = @prepareSchema( schema, options )
+		
+		
 		@config.customerror = options.customerror if options.customerror? and _isFunction( options.customerror )
 		
 		@_initMsgs()
 		return
-
+	
+	prepareSchema: ( schema, options )=>
+		if @isArray
+			for def, idx in schema
+				switch def.type
+					when "schema"
+						if def.schema not instanceof ObjSchema
+							schema[ idx ].schema = new ObjSchema( def.schema, _assignIn( {}, options, { name: options.name + "-" + idx } ) )
+		else
+			for _k, def of schema
+				switch def.type
+					when "schema"
+						if def.schema not instanceof ObjSchema
+							schema[ _k ].schema = new ObjSchema( def.schema, _assignIn( {}, options, { name: options.name + "-" + _k  } ) )
+		return schema
+		
 	keys: =>
 		return Object.keys( @schema )
 
@@ -53,8 +76,9 @@ module.exports = class ObjSchema
 	validateCb: ( [data, options]..., cb )=>
 		_err = @validate( data )
 		if not _err?
+			cb( null )
 			return
-
+		
 		if not cb?
 			throw _err
 
@@ -75,7 +99,7 @@ module.exports = class ObjSchema
 				[ err, _val ] = @_validateKey( idx, data[ idx ], def, data, options )
 				errors.push( err ) if err
 		else
-			if not _isObject( data )
+			if not _isObject( data ) or _isArray( data )
 				return [ @_error( "object", null ) ]
 				
 			for _k, def of @schema
@@ -108,8 +132,6 @@ module.exports = class ObjSchema
 	validateKey: ( key, val, options )=>
 		if not @schema[ key ]
 			return null
-		if @isArray
-			def.idx = key
 		[ err, _val ] = @_validateKey( key, val, @schema[ key ], null, options )
 		if err?
 			return err

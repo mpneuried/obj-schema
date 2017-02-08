@@ -5,24 +5,22 @@ _difference = require('lodash/difference')
 Schema = require( "../." )
 
 userValidator = null
-settingsValidator = null
+settingsValidator = new Schema(
+	"a":
+		type: "string"
+		required: true
+	"b":
+		type: "number"
+	
+	"c":
+		foreignReq: ["b"]
+		type: "boolean"
+
+, { name: "settings" } )
 
 describe "OBJ-SCHEMA -", ->
 
 	before ( done )->
-		settingsValidator = new Schema(
-			"a":
-				type: "string"
-				required: true
-			"b":
-				type: "number"
-			
-			"c":
-				foreignReq: ["b"]
-				type: "boolean"
-		
-		, { name: "settings" } )
-		
 		
 		settingsValidatorArr = new Schema([
 			key: "a",
@@ -53,7 +51,7 @@ describe "OBJ-SCHEMA -", ->
 			"nicknameb":
 				type: "string"
 				check:
-					operand: "<"
+					operand: "<="
 					value: 10
 					
 			"type":
@@ -84,7 +82,7 @@ describe "OBJ-SCHEMA -", ->
 
 			"comment":
 				type: "string"
-				striphtml: true
+				striphtml: [ "b" ]
 
 			"tag":
 				type: "enum"
@@ -105,7 +103,14 @@ describe "OBJ-SCHEMA -", ->
 				
 			"settings_list":
 				type: "schema"
-				schema: settingsValidatorArr
+				schema: [
+					key: "a",
+					type: "string"
+					required: true
+				,
+					key: "b",
+					type: "number"
+				]
 
 			"props":
 				type: "object"
@@ -164,7 +169,7 @@ describe "OBJ-SCHEMA -", ->
 				checkB: 23
 				flagA: false
 				flagB: true
-				comment: "a <b>html</b> test"
+				comment: "a <b>html</b> <i>test</i>"
 
 			err = userValidator.validate( _data )
 			should.not.exist( err )
@@ -175,7 +180,78 @@ describe "OBJ-SCHEMA -", ->
 			_data.flagA.should.eql( false )
 			_data.flagB.should.eql( true )
 			should.exist( _data.comment )
-			_data.comment.should.eql( "a html test" )
+			_data.comment.should.eql( "a <b>html</b> test" )
+			done()
+			return
+		
+		it "success cb", ( done )->
+			_data =
+				name: "John"
+				nickname: "johndoe"
+				nicknameb: "johndoe"
+				type: "ab"
+				email: "john@do.com"
+				sex: "M"
+				tag: "A"
+				list: [1,2,3]
+				age: 23
+				timezone: "CET"
+				settings: { a: "foo", b: 123, c: true }
+				props: { foo: "bar" }
+				active: false
+				money: 1001
+				checkA: 42
+				checkB: 23
+				flagA: false
+				flagB: true
+				comment: "a <b>html</b> <i>test</i>"
+
+			userValidator.validateCb _data, ( err )->
+				should.not.exist( err )
+				should.exist( _data.age )
+				_data.age.should.eql( 23 )
+				should.exist( _data.active )
+				_data.active.should.eql( false )
+				_data.flagA.should.eql( false )
+				_data.flagB.should.eql( true )
+				should.exist( _data.comment )
+				_data.comment.should.eql( "a <b>html</b> test" )
+				done()
+				return
+			return
+			
+		it "success", ( done )->
+			_data =
+				name: "John"
+				nickname: "johndoe"
+				nicknameb: "johndoe"
+				type: "ab"
+				email: "john@do.com"
+				sex: "M"
+				tag: "A"
+				list: [1,2,3]
+				age: 23
+				timezone: "CET"
+				settings: { a: "foo", b: 123, c: true }
+				props: { foo: "bar" }
+				active: false
+				money: 1001
+				checkA: 42
+				checkB: 23
+				flagA: false
+				flagB: true
+				comment: "a <b>html</b> <i>test</i>"
+
+			err = userValidator.validateMulti( _data )
+			should.not.exist( err )
+			should.exist( _data.age )
+			_data.age.should.eql( 23 )
+			should.exist( _data.active )
+			_data.active.should.eql( false )
+			_data.flagA.should.eql( false )
+			_data.flagB.should.eql( true )
+			should.exist( _data.comment )
+			_data.comment.should.eql( "a <b>html</b> test" )
 			done()
 			return
 
@@ -202,7 +278,14 @@ describe "OBJ-SCHEMA -", ->
 			should.exist( err.def )
 			done()
 			return
-
+		
+		it "invalid type", ( done )->
+			[ err ] = userValidator.validateMulti( [ { name: "John", email: "john@do.com", age: "23" } ] )
+			should.exist( err )
+			err.name.should.eql( "EVALIDATION_USER_OBJECT" )
+			done()
+			return
+		
 		it "invalid type", ( done )->
 			err = userValidator.validate( { name: "John", email: "john@do.com", age: "23" } )
 			should.exist( err )
@@ -211,6 +294,27 @@ describe "OBJ-SCHEMA -", ->
 			err.type.should.eql( "number" )
 			done()
 			return
+		
+		it "invalid type cb=true", ( done )->
+			err = userValidator.validateCb( { name: "John", email: "john@do.com", age: "23" }, true )
+			should.exist( err )
+			err.name.should.eql( "EVALIDATION_USER_NUMBER_AGE" )
+			err.field.should.eql( "age" )
+			err.type.should.eql( "number" )
+			done()
+			return
+		
+		it "invalid type cb=null", ( done )->
+			return should.throws( ->
+				userValidator.validateCb( { name: "John", email: "john@do.com", age: "23" }, null )
+			, ( err )->
+				should.exist( err )
+				err.name.should.eql( "EVALIDATION_USER_NUMBER_AGE" )
+				err.field.should.eql( "age" )
+				err.type.should.eql( "number" )
+				done()
+				return
+			)
 
 		it "invalid email", ( done )->
 			err = userValidator.validate( { name: "John", email: "johndocom", age: 23 } )
@@ -253,6 +357,13 @@ describe "OBJ-SCHEMA -", ->
 			err = userValidator.validate( { name: "John", email: "john@do.com", settings: { b: "b" } } )
 			should.exist( err )
 			err.name.should.eql( "EVALIDATION_SETTINGS_REQUIRED_A" )
+			done()
+			return
+		
+		it "invalid subschema required foreignReq", ( done )->
+			err = userValidator.validate( { name: "John", email: "john@do.com", settings: { a: "x", c: true } } )
+			should.exist( err )
+			err.name.should.eql( "EVALIDATION_SETTINGS_REQUIRED_B" )
 			done()
 			return
 
@@ -484,14 +595,14 @@ describe "OBJ-SCHEMA -", ->
 		
 		it "schema-array: use a wrong content for 1st", ( done )->
 			err = userValidator.validate( { name: "John", settings_list: [13, 42] } )
-			err.name.should.eql( "EVALIDATION_SETTINGS-LIST_STRING_A" )
+			err.name.should.eql( "EVALIDATION_USER-SETTINGS_LIST_STRING_A" )
 			err.type.should.eql( "string" )
 			done()
 			return
 		
 		it "schema-array: use a wrong content for 2nd", ( done )->
 			err = userValidator.validate( { name: "John", settings_list: ["foo", "bar"] } )
-			err.name.should.eql( "EVALIDATION_SETTINGS-LIST_NUMBER_B" )
+			err.name.should.eql( "EVALIDATION_USER-SETTINGS_LIST_NUMBER_B" )
 			err.type.should.eql( "number" )
 			done()
 			return
@@ -553,7 +664,7 @@ describe "OBJ-SCHEMA -", ->
 			res = userValidator.validateKey( "comment", "<b>abc</b><div class=\"test\">XYZ</div>" )
 			should.exist( res )
 			res.should.not.instanceof( Error )
-			res.should.eql( "abcXYZ" )
+			res.should.eql( "<b>abc</b>XYZ" )
 			done()
 			return
 		return
@@ -579,10 +690,27 @@ describe "OBJ-SCHEMA -", ->
 				key: "foo"
 				type: "number"
 				default: 42
-		], { name: "user" })
+			,
+				key: "settings"
+				type: "schema"
+				schema: settingsValidator
+			,
+				key: "settings_list"
+				type: "schema"
+				required: true
+				schema: [
+					key: "a",
+					type: "string"
+					required: true
+				,
+					key: "b",
+					type: "number"
+				]
+				
+		])
 		
 		it "successfull validate", ( done )->
-			_data = [ 123, "John", "john@do.com", 23 ]
+			_data = [ 123, "John", "john@do.com", 23, undefined, null, [ "a", 42 ] ]
 			err = userValidatorArray.validate( _data, { type: "create" } )
 			should.not.exist( err )
 			should.exist( _data[3] )
@@ -592,11 +720,29 @@ describe "OBJ-SCHEMA -", ->
 			done()
 			return
 		
+		it "as object", ( done )->
+			_data = { id: null, name: "John", email: "john@do.com", age: 23 }
+			err = userValidatorArray.validate( _data, { type: "create" } )
+			should.exist( err )
+			err.name.should.eql( "EVALIDATION_DATA_ARRAY" )
+			done()
+			return
+			
+		it "validate a single index", ( done )->
+			_data = [ null, "Jo", "john@do.com", 23 ]
+			idx = 1
+			err = userValidatorArray.validateKey( idx, _data[ idx ], { type: "create" } )
+			should.exist( err )
+			err.name.should.eql( "EVALIDATION_DATA_LENGTH_NAME" )
+			err.def.idx.should.eql( idx )
+			done()
+			return
+		
 		it "missing id", ( done )->
 			_data = [ null, "John", "john@do.com", 23 ]
 			err = userValidatorArray.validate( _data, { type: "create" } )
 			should.exist( err )
-			err.name.should.eql( "EVALIDATION_USER_REQUIRED_ID" )
+			err.name.should.eql( "EVALIDATION_DATA_REQUIRED_ID" )
 			err.def.idx.should.eql( 0 )
 			done()
 			return
@@ -605,7 +751,7 @@ describe "OBJ-SCHEMA -", ->
 			_data = [ 45, "Doe", "john@do.com", 23 ]
 			err = userValidatorArray.validate( _data, { type: "create" } )
 			should.exist( err )
-			err.name.should.eql( "EVALIDATION_USER_LENGTH_NAME" )
+			err.name.should.eql( "EVALIDATION_DATA_LENGTH_NAME" )
 			err.def.idx.should.eql( 1 )
 			done()
 			return
@@ -617,32 +763,48 @@ describe "OBJ-SCHEMA -", ->
 			for _e in err
 				switch _e.type
 					when "length"
-						_e.name.should.eql( "EVALIDATION_USER_LENGTH_NAME" )
+						_e.name.should.eql( "EVALIDATION_DATA_LENGTH_NAME" )
 						_e.def.idx.should.eql( 1 )
 					when "email"
-						_e.name.should.eql( "EVALIDATION_USER_EMAIL_EMAIL" )
+						_e.name.should.eql( "EVALIDATION_DATA_EMAIL_EMAIL" )
 						_e.def.idx.should.eql( 2 )
 			done()
 			return
 		
 		it "input invalid data formats as base: `null`", ( done )->
-			err = userValidatorArray.validate( null )
-			err.name.should.eql( "EVALIDATION_USER_ARRAY" )
+			[ err ] = userValidatorArray.validateMulti( null )
+			err.name.should.eql( "EVALIDATION_DATA_ARRAY" )
 			err.type.should.eql( "array" )
 			done()
 			return
 		
 		it "input invalid data formats as base: `boolean`", ( done )->
 			err = userValidatorArray.validate( true )
-			err.name.should.eql( "EVALIDATION_USER_ARRAY" )
+			err.name.should.eql( "EVALIDATION_DATA_ARRAY" )
 			err.type.should.eql( "array" )
 			done()
 			return
 		
 		it "input invalid data formats as base: `object`", ( done )->
 			err = userValidatorArray.validate( { name: "John" } )
-			err.name.should.eql( "EVALIDATION_USER_ARRAY" )
+			err.name.should.eql( "EVALIDATION_DATA_ARRAY" )
 			err.type.should.eql( "array" )
+			done()
+			return
+		
+		it "successfull validate", ( done )->
+			_data = [ 123, "John", "john@do.com", 23, null, { a: "foo", c: false }, [ "a", 42 ] ]
+			err = userValidatorArray.validate( _data, { type: "create" } )
+			err.name.should.eql( "EVALIDATION_SETTINGS_REQUIRED_B" )
+			err.type.should.eql( "required" )
+			done()
+			return
+		
+		it "successfull validate", ( done )->
+			_data = [ 123, "John", "john@do.com", 23, null, null, [ "a", "b" ] ]
+			err = userValidatorArray.validate( _data, { type: "create" } )
+			err.name.should.eql( "EVALIDATION_DATA-6_NUMBER_B" )
+			err.type.should.eql( "number" )
 			done()
 			return
 		

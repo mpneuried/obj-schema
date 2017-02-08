@@ -70,4 +70,4 @@ module.exports = (grunt) ->
 
 	# build the project
 	grunt.registerTask "build", [ "clear", "coffee:base", "includereplace" ]
-	grunt.registerTask "release", [ "clear", "coffee:base", "test" ]
+	grunt.registerTask "release", [ "build", "test" ]
