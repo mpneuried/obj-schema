@@ -54,18 +54,32 @@ module.exports = class ObjSchema
 		return
 	
 	prepareSchema: ( schema, options )=>
+		if not options._path
+			@isRoot = true
+			@_path = []
+		else
+			@isRoot = false
+			@_path = options._path
+			
 		if @isArray
 			for def, idx in schema
 				switch def.type
 					when "schema"
 						if def.schema not instanceof ObjSchema
-							schema[ idx ].schema = new ObjSchema( def.schema, _assignIn( {}, options, { name: options.name + "-" + idx } ) )
+							subOpt =
+								name: options.name + "-" + ( def.key or idx )
+								_path: @_path.concat( [ ( def.key or idx ) ] )
+							schema[ idx ].schema = new ObjSchema( def.schema, subOpt )
 		else
 			for _k, def of schema
 				switch def.type
 					when "schema"
 						if def.schema not instanceof ObjSchema
-							schema[ _k ].schema = new ObjSchema( def.schema, _assignIn( {}, options, { name: options.name + "-" + _k  } ) )
+							subOpt =
+								name: options.name + "-" + _k
+								_path: @_path.concat( [ _k  ] )
+							schema[ _k ].schema = new ObjSchema( def.schema, subOpt)
+		
 		return schema
 		
 	keys: =>
@@ -269,6 +283,8 @@ module.exports = class ObjSchema
 		_err.field = key
 		_err.check = opt.check if opt?.check?
 		_err.def = def
+		if @_path.length
+			_err.path = @_path.join( "/" ) + "/" + key
 		#_err.opt = opt if opt?
 		return _err
 	

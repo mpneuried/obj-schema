@@ -110,6 +110,16 @@ describe "OBJ-SCHEMA -", ->
 				,
 					key: "b",
 					type: "number"
+				,
+					key: "sub",
+					type: "schema"
+					schema:
+						sub_a:
+							type: "string"
+							required: true
+						sub_b:
+							type: "boolean"
+							required: true
 				]
 
 			"props":
@@ -547,6 +557,14 @@ describe "OBJ-SCHEMA -", ->
 			done()
 			return
 		
+		it "schema: test sub-sub schemas", ( done )->
+			err = userValidator.validate( { name: "John", settings: { a: "abc", b: 23 }, settings_list: ["abc",23, { sub_a: "test", sub_b: 123 } ] } )
+			err.name.should.eql( "EVALIDATION_USER-SETTINGS_LIST-SUB_BOOLEAN_SUB_B" )
+			err.type.should.eql( "boolean" )
+			err.path.should.eql( "settings_list/sub/sub_b" )
+			done()
+			return
+		
 		it "schema: use a wrong type for sub-schema", ( done )->
 			err = userValidator.validate( { name: "John", settings: "abc" } )
 			err.name.should.eql( "EVALIDATION_USER_SCHEMA_SETTINGS" )
@@ -803,7 +821,7 @@ describe "OBJ-SCHEMA -", ->
 		it "successfull validate", ( done )->
 			_data = [ 123, "John", "john@do.com", 23, null, null, [ "a", "b" ] ]
 			err = userValidatorArray.validate( _data, { type: "create" } )
-			err.name.should.eql( "EVALIDATION_DATA-6_NUMBER_B" )
+			err.name.should.eql( "EVALIDATION_DATA-SETTINGS_LIST_NUMBER_B" )
 			err.type.should.eql( "number" )
 			done()
 			return

@@ -154,8 +154,8 @@ Validate the data obj and stop on the first error
 
 **Arguments**
 
-* `object` : *( `Object` required )*: The object to validate against the schema
-* `options` : *( `Any` optional )*: options that will be passed to the schema functions `fnSkip` and `default`. See `example.js`.
+* **`object`** : *( `Object` required )*: The object to validate against the schema
+* **`options`** : *( `Any` optional )*: options that will be passed to the schema functions `fnSkip` and `default`. See `example.js`.
 
 **Return**
 
@@ -180,8 +180,8 @@ Validate the data obj and stop on the first error
 
 **Arguments**
 
-* `object` : *( `Object` required )*: The object to validate against the schema
-* `options` : *( `Any` optional )*: options that will be passed to the schema functions `fnSkip` and `default`. See `example.js`.
+* **`object`** : *( `Object` required )*: The object to validate against the schema
+* **`options`** : *( `Any` optional )*: options that will be passed to the schema functions `fnSkip` and `default`. See `example.js`.
 
 **Return**
 
@@ -207,9 +207,9 @@ Validate olny one single key
 
 **Arguments**
 
-* `key` : *( `String` required )*: The schema key to validate
-* `value ` : *( `Any` required )*: the data to validate
-* `options` : *( `Any` optional )*: options that will be passed to the schema functions `fnSkip` and `default`. See `example.js`.
+* **`key`** : *( `String` required )*: The schema key to validate
+* **`value `** : *( `Any` required )*: the data to validate
+* **`options`** : *( `Any` optional )*: options that will be passed to the schema functions `fnSkip` and `default`. See `example.js`.
 
 **Return**
 
@@ -246,9 +246,9 @@ A helper method to use it with a callback.
 
 **Arguments**
 
-* `object` : *( `Object` required )*: The object to validate against the schema
-* `cb` : *( `Object` required )*: The object to validate against the schema
-* `options` : *( `Any` optional )*: options that will be passed to the schema functions `fnSkip` and `default`. See `example.js`.
+* **`object`** : *( `Object` required )*: The object to validate against the schema
+* **`cb`** : *( `Object` required )*: The object to validate against the schema
+* **`options`** : *( `Any` optional )*: options that will be passed to the schema functions `fnSkip` and `default`. See `example.js`.
 
 **Return**
 
@@ -271,10 +271,10 @@ You can define your own error obj. creator by defining a custom function in `opt
 
 **Arguments**
 
-* `errtype` : *( `String` required )*: The error type. This could be one of the Schema-Types
-* `key` : *( `String` required )*: The key that doues not match
-* `def` : *( `Object` required )*: The schema definition of the key
-* `opt` : *( `Object` required )*: additional informations to generate the data
+* **`errtype`** : *( `String` required )*: The error type. This could be one of the Schema-Types
+* **`key`** : *( `String` required )*: The key that doues not match
+* **`def`** : *( `Object` required )*: The schema definition of the key
+* **`opt`** : *( `Object` required )*: additional informations to generate the data
 
 **Return**
 
@@ -296,14 +296,14 @@ This module uses a custom Error ( `ObjSchemaError` ) to add some meta data to th
 
 **Arguments**
 
-* `name` : *( `String` )*: The error name. Format: `EVALIDATION_{options.name}_{error-type}_{object-key}` E.g. `EVALIDATION_USER_REQUIRED_NAME`
-* `message` : *( `String` )*: A human friendly error message. E.g. `Please define the value 'name'`
-* `stack` : *( `String` )*: A error stack trace
-* `customError` : *( `Boolean` )*: A flag to define this error as a custom error. This is always `true`.
-* `statusCode` : *( `Number` )*: A http status code to use in http response
-* `def` : *( `Object` )*: the field definition. E.g. `{ type: "string", required: true }`
-* `check` : *( `Object` )*: if it's an error type `check` this is the relevant data. `{ operand: "gte", value: 23 }`. The operand will be reduced to the values `eq,neq,gt,gte,lt,lte,between`.
-* `type` : *( `String` )*: The objects error type.  
+* **`name`** : *( `String` )*: The error name. Format: `EVALIDATION_{options.name}_{error-type}_{object-key}` E.g. `EVALIDATION_USER_REQUIRED_NAME`
+* **`message`** : *( `String` )*: A human friendly error message. E.g. `Please define the value 'name'`
+* **`stack`** : *( `String` )*: A error stack trace
+* **`customError`** : *( `Boolean` )*: A flag to define this error as a custom error. This is always `true`.
+* **`statusCode`** : *( `Number` )*: A http status code to use in http response
+* **`def`** : *( `Object` )*: the field definition. E.g. `{ type: "string", required: true }`
+* **`check`** : *( `Object` )*: if it's an error type `check` this is the relevant data. `{ operand: "gte", value: 23 }`. The operand will be reduced to the values `eq,neq,gt,gte,lt,lte,between`.
+* **`type`** : *( `String` )*: The objects error type.  
 Possible error types:
     * `required` : Is required and not set
     * `number` : Is not a number
@@ -317,7 +317,10 @@ Possible error types:
     * `enum` : Is not within the given list
     * `length` : The string length  isn't within the defined boundaries
     * `check` : The numeric value isn't within the defined boundaries
-* `field` : *( `String` )*: The objects field the error occurred in. E.g. `name`
+* **`field`** : *( `String` )*: The objects field the error occurred in. E.g. `name`
+* **`path`** : *( `String` )*: A string representing the path through the sub schemas.  
+If the error occurred in the root schema the path will not exist  
+The keys are seperated by a `/`. E.g. `address/phones/mobile`
 
 ## Advanced example
 
@@ -399,7 +402,8 @@ var uservalidator = new Schema( {
 
 |Version|Date|Description|
 |:--:|:--:|:--|
-|1.5.0|2017-02-08|it's now possible to nest a sub-schema direct within the parent as `schema: { ... } | [ ... ]`; Optimized tests for 100% codeverage|
+|1.5.1|2017-02-09|added path to error object to show the path through sub-schemas and optimized the generated name for sub schemas|
+|1.5.0|2017-02-08|it's now possible to nest a sub-schema direct within the parent as `schema: { ... } / [ ... ]`; Optimized tests for 100% codeverage|
 |1.4.0|2016-11-14|validate the basic input object for a object/array|
 |1.3.0|2016-11-11|added option `customerror` to be able to create your own error objects|
 |1.2.3|2016-10-07|Optimized sub-schema data type validation to check for object/array; use coveralls directly with coffee|
@@ -408,7 +412,7 @@ var uservalidator = new Schema( {
 |1.1.3|2016-03-08|updated dependencies. Especially lodash to version 4|
 |1.1.2|2015-07-31|removed dependency `mpbasic` for a smaller footprint within browserify|
 |1.1.1|2015-07-14|reduced error check operand to the values `eq,neq,gt,gte,lt,lte,between`|
-|1.1.0|2015-07-14|added check mode `between|btw|><` to check a string length or numeric value.|
+|1.1.0|2015-07-14|added check mode `between/btw/><` to check a string length or numeric value.|
 |1.0.0|2015-07-09|added method `.validateKey()` to validate only one key. Added `fnSkip` definition method. Added optional options, that will be passed to the functions `fnSkip` and `default`. Changed arguments of default function. |
 |0.3.0|2015-06-26|added method `.validateMulti()` retrieve all validation errors at once|
 |0.2.0|2015-06-25|Changed strip tags module to be able to use this module with browserify|
