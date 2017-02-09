@@ -383,6 +383,13 @@ describe "OBJ-SCHEMA -", ->
 			err.name.should.eql( "EVALIDATION_USER_OBJECT_PROPS" )
 			done()
 			return
+			
+		it "invalid object as array", ( done )->
+			err = userValidator.validate( { name: "John", email: "john@do.com", props: [ "foo", "bar" ] } )
+			should.exist( err )
+			err.name.should.eql( "EVALIDATION_USER_OBJECT_PROPS" )
+			done()
+			return
 
 		it "invalid boolean", ( done )->
 			err = userValidator.validate( { name: "John", email: "john@do.com", active: "NO" } )

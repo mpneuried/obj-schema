@@ -402,7 +402,8 @@ var uservalidator = new Schema( {
 
 |Version|Date|Description|
 |:--:|:--:|:--|
-|1.5.2|2017-02-09|fixed pass of missing customerror option to sub schemas|
+|1.5.3|2017-02-09|fixed: a array was accepted as type "object" |
+|1.5.2|2017-02-09|fixed: pass of missing customerror option to sub schemas|
 |1.5.1|2017-02-09|added path to error object to show the path through sub-schemas and optimized the generated name for sub schemas|
 |1.5.0|2017-02-08|it's now possible to nest a sub-schema direct within the parent as `schema: { ... } / [ ... ]`; Optimized tests for 100% codeverage|
 |1.4.0|2016-11-14|validate the basic input object for a object/array|

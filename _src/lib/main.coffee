@@ -190,7 +190,7 @@ module.exports = class ObjSchema
 					return [ @_error( "boolean", _key, def ), val ]
 
 			when "object"
-				if val? and ( not _isObject( val ) )
+				if val? and ( not _isObject( val ) or _isArray( val ) )
 					return [ @_error( "object", _key, def ), val ]
 
 			when "string", "enum"
