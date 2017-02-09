@@ -867,6 +867,20 @@ describe "OBJ-SCHEMA -", ->
 				type: "email"
 			age:
 				default: fnDefaultAge
+			settings:
+				type: "schema"
+				schema: [
+						key: "a"
+						type: "number"
+					, 
+						key: "sub"
+						type: "schema"
+						schema:
+							c: 
+								type: "boolean"
+						
+				]
+				
 		}, { name: "user_custom", customerror: fnCustomError })
 		
 		

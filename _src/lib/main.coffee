@@ -69,6 +69,7 @@ module.exports = class ObjSchema
 							subOpt =
 								name: options.name + "-" + ( def.key or idx )
 								_path: @_path.concat( [ ( def.key or idx ) ] )
+							subOpt.customerror = options.customerror if options.customerror?
 							schema[ idx ].schema = new ObjSchema( def.schema, subOpt )
 		else
 			for _k, def of schema
@@ -78,6 +79,7 @@ module.exports = class ObjSchema
 							subOpt =
 								name: options.name + "-" + _k
 								_path: @_path.concat( [ _k  ] )
+							subOpt.customerror = options.customerror if options.customerror?
 							schema[ _k ].schema = new ObjSchema( def.schema, subOpt)
 		
 		return schema
