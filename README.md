@@ -403,7 +403,8 @@ var uservalidator = new Schema( {
 
 |Version|Date|Description|
 |:--:|:--:|:--|
-|1.6.0|2017-02-09|added feature to allow `null` for required values if `nullAllowed: true` |
+|1.6.1|2017-02-20|fixed failed build/publish|
+|1.6.0|2017-02-20|added feature to allow `null` for required values if `nullAllowed: true` |
 |1.5.3|2017-02-09|fixed: a array was accepted as type "object" |
 |1.5.2|2017-02-09|fixed: pass of missing customerror option to sub schemas|
 |1.5.1|2017-02-09|added path to error object to show the path through sub-schemas and optimized the generated name for sub schemas|
