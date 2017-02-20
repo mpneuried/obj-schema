@@ -89,6 +89,7 @@ If the schema is configured to change the values it'll do this directly on the o
 
 - **type**: *( `String` )*: The data type for detailed validation. All availible types will be described below.
 - **required**: *( `Boolean` )*: This key is required
+- **nullAllowed**: *( `Boolean`, default: `false` )*: If the key is `required: true` you can allow `null` as valid value.
 - **default**: *( `Any|Function` )*: A default value or a function to generate the default. This function will receive the arguments `( key, val, data, options )`. `data` = the whole object to validate; `def` = the current schema type config.
 - **foreignReq**: *( `String[]` )*: Is only valid if the keys within this list exists
 - **fnSkip**: *( `Function` )*: A function to determine if a validation should be skipped. As a return it expects a boolean. The arguments passed to the function are `( key, val, data, options )`.
@@ -402,6 +403,7 @@ var uservalidator = new Schema( {
 
 |Version|Date|Description|
 |:--:|:--:|:--|
+|1.6.0|2017-02-09|added feature to allow `null` for required values if `nullAllowed: true` |
 |1.5.3|2017-02-09|fixed: a array was accepted as type "object" |
 |1.5.2|2017-02-09|fixed: pass of missing customerror option to sub schemas|
 |1.5.1|2017-02-09|added path to error object to show the path through sub-schemas and optimized the generated name for sub schemas|

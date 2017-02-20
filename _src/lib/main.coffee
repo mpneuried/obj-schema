@@ -165,6 +165,9 @@ module.exports = class ObjSchema
 		else
 			_key = key
 		
+		if val is null and def.required and def.nullAllowed
+			return [ null, val ]
+			
 		if def.required and not val?
 			return [ @_error( "required", _key, def ), val ]
 		else if not val?
@@ -174,7 +177,6 @@ module.exports = class ObjSchema
 				else
 					val = def.default
 				data[ key ] = val if data?
-
 		
 		switch def.type
 			when "number"

@@ -5,6 +5,7 @@ _difference = require('lodash/difference')
 Schema = require( "../." )
 
 userValidator = null
+userNullValidator = null
 settingsValidator = new Schema(
 	"a":
 		type: "string"
@@ -131,12 +132,14 @@ describe "OBJ-SCHEMA -", ->
 			
 			"flagA":
 				type: "boolean"
+				nullAllowed: true
 				
 			"flagB":
 				type: "boolean"
 		
 			"checkA":
 				type: "number"
+				nullAllowed: true
 				check:
 					operand: "neq"
 					value: 23
@@ -148,6 +151,56 @@ describe "OBJ-SCHEMA -", ->
 					value: 23
 
 		, { name: "user" } )
+
+		userNullValidator = new Schema(
+			"flagA":
+				required: true
+				type: "boolean"
+				nullAllowed: true
+				
+			"flagB":
+				required: true
+				type: "boolean"
+		
+			"checkA":
+				required: true
+				type: "number"
+				nullAllowed: true
+				check:
+					operand: "neq"
+					value: 23
+
+			"checkB":
+				required: true
+				type: "number"
+				check:
+					operand: "eq"
+					value: 23
+			
+			"settings_list":
+				required: true
+				nullAllowed: true
+				type: "schema"
+				schema: [
+					key: "a",
+					type: "string"
+					required: true
+				,
+					key: "b",
+					type: "number"
+				,
+					key: "sub",
+					type: "schema"
+					schema:
+						sub_a:
+							type: "string"
+							required: true
+						sub_b:
+							type: "boolean"
+							required: true
+				]
+
+		, { name: "user-null" } )
 
 		done()
 		return
@@ -650,6 +703,33 @@ describe "OBJ-SCHEMA -", ->
 			err = userValidator.validate( [ "John" ] )
 			err.name.should.eql( "EVALIDATION_USER_OBJECT" )
 			err.type.should.eql( "object" )
+			done()
+			return
+		
+		it "check for `null` if `nullAllowed`", ( done )->
+			_data =
+				checkA: null
+				checkB: 23
+				flagA: null
+				flagB: true
+				settings_list: null
+			
+			err = userNullValidator.validate( _data )
+			should.not.exist( err )
+			done()
+			return
+			
+		it "check for `null` if not `nullAllowed`", ( done )->
+			_data =
+				checkA: 42
+				checkB: null
+				flagA: false
+				flagB: null
+				settings_list: [ "abc",23 ]
+			
+			err = userNullValidator.validate( _data )
+			err.name.should.eql( "EVALIDATION_USER-NULL_REQUIRED_FLAGB" )
+			err.type.should.eql( "required" )
 			done()
 			return
 		
