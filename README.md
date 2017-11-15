@@ -403,6 +403,7 @@ var uservalidator = new Schema( {
 
 |Version|Date|Description|
 |:--:|:--:|:--|
+|1.6.2|2017-11-15|fixed dependency licence issue by replacing the `js-striphtml` with `striptags`|
 |1.6.1|2017-02-20|fixed failed build/publish|
 |1.6.0|2017-02-20|added feature to allow `null` for required values if `nullAllowed: true` |
 |1.5.3|2017-02-09|fixed: a array was accepted as type "object" |

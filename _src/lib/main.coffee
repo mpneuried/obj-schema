@@ -20,7 +20,7 @@ _template = require( "lodash/template" )
 
 moment = require( "moment-timezone" )
 sanitizer = require( "sanitizer" )
-htmlStrip = require('js-striphtml')
+stripTags = require( "striptags" )
 
 class ObjSchemaError extends Error
 	statusCode: 406
@@ -225,9 +225,9 @@ module.exports = class ObjSchema
 			
 		if val? and def.type is "string" and def.striphtml?
 			if _isArray( def.striphtml )
-				val = htmlStrip.stripTags( val, def.striphtml )
+				val = stripTags( val, def.striphtml )
 			else
-				val = htmlStrip.stripTags( val )
+				val = stripTags( val )
 			data[ key ] = val if data?
 
 		if val? and def.type is "string" and def.trim
